@@ -66,6 +66,7 @@
     <Compile Include="GeneratedClassCommentsChecker.cs" />
     <Compile Include="GeneratedCommentsChecker.cs" />
     <Compile Include="GeneratedFieldCommentsChecker.cs" />
+    <Compile Include="GeneratedInterfaceCommentsChecker.cs" />
     <Compile Include="GeneratedMethodCommentsChecker.cs" />
     <Compile Include="GeneratedPropertyCommentsChecker.cs" />
     <Compile Include="IGeneratedCommentsChecker.cs" />

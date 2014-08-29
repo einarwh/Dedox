@@ -21,65 +21,21 @@ namespace Dedox
             }
         }
 
-        public override bool IsGenerated()
+        protected override void OnMismatch(string tag, string expectedComment, string actualComment)
         {
-            var docTrivia = GetDocumentationTrivia();
-            var st = docTrivia.GetStructure();
-            if (st == null)
+            if ("returns".Equals(tag))
             {
-                // No XML comments.
-                // Console.WriteLine("Method {0} has no XML comments.", methodName);
-                return false;
-            }
-
-            var childNodes = st.ChildNodes();
-            var maybeXmlElements = childNodes.Where(n => n.Kind == SyntaxKind.XmlElement);
-            var xmlElements = maybeXmlElements.Cast<XmlElementSyntax>();
-
-            foreach (XmlElementSyntax e in xmlElements)
-            {
-                XmlElementStartTagSyntax startTag = e.StartTag;
-                string tag = startTag.Name.LocalName.ValueText;
-                var expectedComment = GetExpectedMethodCommentForTag(startTag);
-                if (expectedComment == null)
+                const string genericReturnsPattern = @"The <see cref=""(\w+)""/>\.";
+                var match = Regex.Match(actualComment, genericReturnsPattern);
+                if (match.Success)
                 {
-                    Console.WriteLine("Failed to produce an expectation for tag " + tag);
-                    return false;
+                    var typeName = match.Groups[1].Value;
+                    Console.WriteLine("The XML comment for the returns tag is probably obsolete.");
+                    Console.WriteLine("Should be {0} but is actually {1}.", GetTypeNameForReturnsComment(), typeName);
                 }
 
-                string actualComment = ReadTagComment(e.Content);
-
-                if (!expectedComment.Equals(actualComment))
-                {
-                    Console.WriteLine("Comment mismatch.");
-                    Console.WriteLine("Expected comment: '{0}'", expectedComment);
-                    Console.WriteLine("Actual comment: '{0}'", actualComment);
-
-                    var dist = LevenshteinDistance.Compute(expectedComment, actualComment);
-                    Console.WriteLine("Levenshtein distance: " + dist);
-
-                    if ("returns".Equals(tag))
-                    {
-                        const string genericReturnsPattern = @"The <see cref=""(\w+)""/>\.";
-                        var match = Regex.Match(actualComment, genericReturnsPattern);
-                        if (match.Success)
-                        {
-                            var typeName = match.Groups[1].Value;
-                            Console.WriteLine("The XML comment for the returns tag is probably obsolete.");
-                            Console.WriteLine("Should be {0} but is actually {1}.", GetTypeNameForReturnsComment(), typeName);
-                        }
-
-                        Console.WriteLine();
-                    }
-
-                    return false;
-                }
+                Console.WriteLine();
             }
-
-            Console.WriteLine("All the documentation for method {0} was written by a tool.", Name);
-            Console.WriteLine();
-            
-            return true;
         }
 
         private string GetTypeNameForReturnsComment()
@@ -111,14 +67,13 @@ namespace Dedox
             return null;
         }
 
-        private string GetExpectedMethodCommentForTag(XmlElementStartTagSyntax startTag)
+        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
-            var methodName = It.Identifier.ValueText;
             string tag = startTag.Name.LocalName.ValueText;
 
             if ("summary".Equals(tag))
             {
-                var fixedMethodName = NaiveNameFixer(methodName);
+                var fixedMethodName = NaiveNameFixer(Name);
                 var expectedMethodComment = string.Format("The {0}.", fixedMethodName);
                 Console.WriteLine("Expected method comment (based on method name): '{0}'", expectedMethodComment);
                 return expectedMethodComment;

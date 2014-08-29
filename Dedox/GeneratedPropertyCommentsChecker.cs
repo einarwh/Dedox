@@ -21,56 +21,25 @@ namespace Dedox
             }
         }
 
-        public override bool IsGenerated()
+        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
-            Console.WriteLine();
-            Console.WriteLine("Property: " + Name);
-
-            var predictedPropertySummaryText = GetPredictedPropertySummaryText();
-            var predictedPropertyValueText = GetPredictedPropertyValueText();
-
-            var expected = new Dictionary<string, string>();
-            expected["summary"] = predictedPropertySummaryText;
-            expected["value"] = predictedPropertyValueText;
-
-            var docTrivia = GetDocumentationTrivia();
-            var st = docTrivia.GetStructure();
-            if (st == null)
+            var tag = startTag.Name.LocalName.ValueText;
+            if ("summary".Equals(tag))
             {
-                // No XML comments.
-                Console.WriteLine("Property {0} has no XML comments.", Name);
-                return false;
+                var expectedComment = GetPredictedPropertySummaryText();
+                Console.WriteLine("Expected comment: '{0}'", expectedComment);
+                return expectedComment;
             }
 
-            var childNodes = st.ChildNodes();
-            var maybeXmlElements = childNodes.Where(n => n.Kind == SyntaxKind.XmlElement);
-            var xmlElements = maybeXmlElements.Cast<XmlElementSyntax>();
-
-            foreach (XmlElementSyntax e in xmlElements)
+            if ("value".Equals(tag))
             {
-                string tag = e.StartTag.Name.LocalName.ValueText;
-                if (!expected.ContainsKey(tag))
-                {
-                    // The XML comments contains an unexpected tag, 
-                    // indicating it hasn't been (all) auto-generated.
-                    Console.WriteLine("Property {0} has extra tag {1}.", Name, tag);
-                    return false;
-                }
-
-                string expectedComment = expected[tag];
-                string actualComment = ReadTagComment(e.Content);
-                if (!string.Equals(expectedComment, actualComment, StringComparison.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine("Mismatch between expected comment '{0}' and actual comment '{1}'.", expectedComment, actualComment);
-                    var dist = LevenshteinDistance.Compute(expectedComment, actualComment);
-                    Console.WriteLine("Levenshtein distance: " + dist);
-                    return false;
-                }
+                var expectedComment = GetPredictedPropertyValueText();
+                Console.WriteLine("Expected comment: '{0}'", expectedComment);
+                return expectedComment;
             }
 
-            Console.WriteLine("All the documentation for property {0} was written by a tool.", Name);
-
-            return true;
+            Console.WriteLine("Unexpected tag {0} in property comment.", tag);
+            return null;
         }
 
         private string GetPredictedPropertyValueText()

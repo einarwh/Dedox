@@ -20,6 +20,10 @@ namespace Dedox
                 .Where(n => n.Kind == SyntaxKind.ClassDeclaration)
                 .Cast<ClassDeclarationSyntax>();
 
+            var interfaceNodes = nodes
+                .Where(n => n.Kind == SyntaxKind.InterfaceDeclaration)
+                .Cast<InterfaceDeclarationSyntax>();
+
             var fieldNodes = nodes
                 .Where(n => n.Kind == SyntaxKind.FieldDeclaration)
                 .Cast<FieldDeclarationSyntax>();
@@ -33,6 +37,8 @@ namespace Dedox
 
             var purgeClasses = classNodes.Where(IsClassDocumentationGenerated).ToList();
 
+            var purgeInterfaces = interfaceNodes.Where(IsInterfaceDocumentationGenerated).ToList();
+
             var purgeFields = fieldNodes.Where(IsFieldDocumentationGenerated).ToList();
 
             var purgeProperties = propertyNodes.Where(IsPropertyDocumentationGenerated).ToList();
@@ -41,6 +47,7 @@ namespace Dedox
 
             var purgeMembers = purgeFields.Cast<MemberDeclarationSyntax>()
                 .Concat(purgeClasses)
+                .Concat(purgeInterfaces)
                 .Concat(purgeProperties)
                 .Concat(purgeMethods)
                 .ToList();
@@ -53,6 +60,17 @@ namespace Dedox
                     foreach (var c in purgeClasses)
                     {
                         Console.WriteLine(" - {0}", c.Identifier.ValueText);
+                    }
+
+                    Console.WriteLine();
+                }
+
+                if (purgeInterfaces.Any())
+                {
+                    Console.WriteLine("Remove XML comments from these interfaces:");
+                    foreach (var it in purgeInterfaces)
+                    {
+                        Console.WriteLine(" - {0}", it.Identifier.ValueText);
                     }
 
                     Console.WriteLine();
@@ -123,6 +141,11 @@ namespace Dedox
         private static bool IsClassDocumentationGenerated(ClassDeclarationSyntax classDeclaration)
         {
             return new GeneratedClassCommentsChecker(classDeclaration).IsGenerated();
+        }
+
+        private static bool IsInterfaceDocumentationGenerated(InterfaceDeclarationSyntax interfaceDeclaration)
+        {
+            return new GeneratedInterfaceCommentsChecker(interfaceDeclaration).IsGenerated();
         }
 
         private static bool IsFieldDocumentationGenerated(FieldDeclarationSyntax fieldDeclaration)
