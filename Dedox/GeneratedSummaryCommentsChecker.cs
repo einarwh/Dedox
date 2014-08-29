@@ -4,19 +4,11 @@ using Roslyn.Compilers.CSharp;
 
 namespace Dedox
 {
-    class GeneratedFieldCommentsChecker : GeneratedCommentsChecker<FieldDeclarationSyntax>
+    abstract class GeneratedSummaryCommentsChecker<T> : GeneratedCommentsChecker<T> where T : SyntaxNode
     {
-        public GeneratedFieldCommentsChecker(FieldDeclarationSyntax fieldDeclaration)
-            : base(fieldDeclaration)
+        protected GeneratedSummaryCommentsChecker(T it)
+            : base(it)
         {
-        }
-
-        protected override string Name
-        {
-            get
-            {
-                return It.Declaration.Variables.First().Identifier.ValueText;
-            }
         }
 
         protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
@@ -29,7 +21,7 @@ namespace Dedox
                 return expectedComment;
             }
 
-            Console.WriteLine("Unexpected tag {0} in field comment.", tag);
+            Console.WriteLine("Unexpected tag {0} in comment.", tag);
             return null;
         }
     }

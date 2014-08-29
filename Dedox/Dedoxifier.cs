@@ -24,6 +24,14 @@ namespace Dedox
                 .Where(n => n.Kind == SyntaxKind.InterfaceDeclaration)
                 .Cast<InterfaceDeclarationSyntax>();
 
+            var enumNodes = nodes
+                .Where(n => n.Kind == SyntaxKind.EnumDeclaration)
+                .Cast<EnumDeclarationSyntax>();
+
+            var enumMemberNodes = nodes
+                .Where(n => n.Kind == SyntaxKind.EnumMemberDeclaration)
+                .Cast<EnumMemberDeclarationSyntax>();
+
             var fieldNodes = nodes
                 .Where(n => n.Kind == SyntaxKind.FieldDeclaration)
                 .Cast<FieldDeclarationSyntax>();
@@ -31,6 +39,7 @@ namespace Dedox
             var propertyNodes = nodes
                 .Where(n => n.Kind == SyntaxKind.PropertyDeclaration)
                 .Cast<PropertyDeclarationSyntax>();
+            
             var methodNodes = nodes
                 .Where(n => n.Kind == SyntaxKind.MethodDeclaration)
                 .Cast<MethodDeclarationSyntax>();
@@ -38,6 +47,10 @@ namespace Dedox
             var purgeClasses = classNodes.Where(IsClassDocumentationGenerated).ToList();
 
             var purgeInterfaces = interfaceNodes.Where(IsInterfaceDocumentationGenerated).ToList();
+
+            var purgeEnums = enumNodes.Where(IsEnumDocumentationGenerated).ToList();
+
+            var purgeEnumMembers = enumMemberNodes.Where(IsEnumMemberDocumentationGenerated).ToList();
 
             var purgeFields = fieldNodes.Where(IsFieldDocumentationGenerated).ToList();
 
@@ -48,6 +61,8 @@ namespace Dedox
             var purgeMembers = purgeFields.Cast<MemberDeclarationSyntax>()
                 .Concat(purgeClasses)
                 .Concat(purgeInterfaces)
+                .Concat(purgeEnums)
+                .Concat(purgeEnumMembers)
                 .Concat(purgeProperties)
                 .Concat(purgeMethods)
                 .ToList();
@@ -75,6 +90,29 @@ namespace Dedox
 
                     Console.WriteLine();
                 }
+
+                if (purgeEnums.Any())
+                {
+                    Console.WriteLine("Remove XML comments from these enums:");
+                    foreach (var it in purgeEnums)
+                    {
+                        Console.WriteLine(" - {0}", it.Identifier.ValueText);
+                    }
+
+                    Console.WriteLine();
+                }
+
+                if (purgeEnumMembers.Any())
+                {
+                    Console.WriteLine("Remove XML comments from these enum members:");
+                    foreach (var it in purgeEnumMembers)
+                    {
+                        Console.WriteLine(" - {0}", it.Identifier.ValueText);
+                    }
+
+                    Console.WriteLine();
+                }
+
 
                 if (purgeFields.Any())
                 {
@@ -136,6 +174,16 @@ namespace Dedox
             Console.WriteLine();
 
             Console.ReadKey();
+        }
+
+        private static bool IsEnumMemberDocumentationGenerated(EnumMemberDeclarationSyntax enumMemberDeclaration)
+        {
+            return new GeneratedEnumMemberCommentsChecker(enumMemberDeclaration).IsGenerated();
+        }
+
+        private static bool IsEnumDocumentationGenerated(EnumDeclarationSyntax enumDeclaration)
+        {
+            return new GeneratedEnumCommentsChecker(enumDeclaration).IsGenerated();
         }
 
         private static bool IsClassDocumentationGenerated(ClassDeclarationSyntax classDeclaration)
