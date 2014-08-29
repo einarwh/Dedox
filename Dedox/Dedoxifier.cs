@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 using Roslyn.Compilers.CSharp;
 
@@ -44,6 +43,10 @@ namespace Dedox
                 .Where(n => n.Kind == SyntaxKind.MethodDeclaration)
                 .Cast<MethodDeclarationSyntax>();
 
+            var ctorNodes = nodes
+                .Where(n => n.Kind == SyntaxKind.ConstructorDeclaration)
+                .Cast<ConstructorDeclarationSyntax>();
+
             var purgeClasses = classNodes.Where(IsClassDocumentationGenerated).ToList();
 
             var purgeInterfaces = interfaceNodes.Where(IsInterfaceDocumentationGenerated).ToList();
@@ -58,6 +61,8 @@ namespace Dedox
 
             var purgeMethods = methodNodes.Where(IsMethodDocumentationGenerated).ToList();
 
+            var purgeCtors = ctorNodes.Where(IsConstructorDocumentationGenerated).ToList();
+
             var purgeMembers = purgeFields.Cast<MemberDeclarationSyntax>()
                 .Concat(purgeClasses)
                 .Concat(purgeInterfaces)
@@ -65,6 +70,7 @@ namespace Dedox
                 .Concat(purgeEnumMembers)
                 .Concat(purgeProperties)
                 .Concat(purgeMethods)
+                .Concat(purgeCtors)
                 .ToList();
 
             if (purgeMembers.Any())
@@ -147,6 +153,18 @@ namespace Dedox
                     Console.WriteLine();
                 }
 
+                if (purgeCtors.Any())
+                {
+                    Console.WriteLine("Remove XML comments from these constructors:");
+                    foreach (var c in purgeCtors)
+                    {
+                        Console.WriteLine(" - {0}", c.Identifier.ValueText);
+                    }
+
+                    Console.WriteLine();
+                }
+
+
                 var root = tree.GetRoot();
                 var removeTrivia = new List<SyntaxTrivia>();
 
@@ -174,6 +192,11 @@ namespace Dedox
             Console.WriteLine();
 
             Console.ReadKey();
+        }
+
+        private static bool IsConstructorDocumentationGenerated(ConstructorDeclarationSyntax arg)
+        {
+            return new GeneratedConstructorCommentsChecker(arg).IsGenerated();
         }
 
         private static bool IsEnumMemberDocumentationGenerated(EnumMemberDeclarationSyntax enumMemberDeclaration)

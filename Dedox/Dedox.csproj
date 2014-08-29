@@ -65,6 +65,7 @@
     <Compile Include="Dedoxifier.cs" />
     <Compile Include="GeneratedClassCommentsChecker.cs" />
     <Compile Include="GeneratedCommentsChecker.cs" />
+    <Compile Include="GeneratedConstructorCommentsChecker.cs" />
     <Compile Include="GeneratedEnumCommentsChecker.cs" />
     <Compile Include="GeneratedEnumMemberCommentsChecker.cs" />
     <Compile Include="GeneratedFieldCommentsChecker.cs" />
