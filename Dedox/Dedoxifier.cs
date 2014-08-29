@@ -8,7 +8,7 @@ namespace Dedox
 {
     public static class Dedoxifier
     {
-        public static void Run(string text)
+        public static string Run(string text)
         {
             Console.WriteLine("Running Dedox...");
 
@@ -164,7 +164,6 @@ namespace Dedox
                     Console.WriteLine();
                 }
 
-
                 var root = tree.GetRoot();
                 var removeTrivia = new List<SyntaxTrivia>();
 
@@ -182,16 +181,13 @@ namespace Dedox
                 }
 
                 var newRoot = root.ReplaceTrivia(removeTrivia, (t1, t2) => SyntaxTriviaList.Empty);
-                Console.WriteLine(newRoot);
-            }
-            else
-            {
-                Console.WriteLine("Nothing to dedox.");
-            }
 
-            Console.WriteLine();
+                return newRoot.ToFullString();
+            }
+            
+            Console.WriteLine("Nothing to dedox.");
 
-            Console.ReadKey();
+            return null;
         }
 
         private static bool IsConstructorDocumentationGenerated(ConstructorDeclarationSyntax arg)
@@ -227,11 +223,6 @@ namespace Dedox
         private static bool IsMethodDocumentationGenerated(MethodDeclarationSyntax methodDeclaration)
         {
             return new GeneratedMethodCommentsChecker(methodDeclaration).IsGenerated();
-        }
-
-        private static SyntaxTrivia GetDocumentationTrivia(MemberDeclarationSyntax p)
-        {
-            return p.GetLeadingTrivia().FirstOrDefault(t => t.Kind == SyntaxKind.DocumentationCommentTrivia);
         }
 
         private static bool IsPropertyDocumentationGenerated(PropertyDeclarationSyntax p)
