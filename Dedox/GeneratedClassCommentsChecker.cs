@@ -22,6 +22,7 @@ namespace Dedox
 
         public override bool IsGenerated()
         {
+            Console.WriteLine();
             Console.WriteLine("Class: " + Name);
 
             var docTrivia = GetDocumentationTrivia();
@@ -64,7 +65,6 @@ namespace Dedox
             }
 
             Console.WriteLine("All the documentation for class {0} was written by a tool.", Name);
-            Console.WriteLine();
 
             return true;
         }

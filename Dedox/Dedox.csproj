@@ -67,6 +67,7 @@
     <Compile Include="GeneratedCommentsChecker.cs" />
     <Compile Include="GeneratedFieldCommentsChecker.cs" />
     <Compile Include="GeneratedMethodCommentsChecker.cs" />
+    <Compile Include="GeneratedPropertyCommentsChecker.cs" />
     <Compile Include="IGeneratedCommentsChecker.cs" />
     <Compile Include="ITagCommentReaderState.cs" />
     <Compile Include="LevenshteinDistance.cs" />
