@@ -1,16 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Roslyn.Compilers.CSharp;
 
 namespace Dedox
 {
-    public static class Dedoxifier
+    public class Dedoxifier
     {
-        public static string Run(string text)
+        private readonly TextWriter _writer;
+
+        public Dedoxifier(TextWriter writer)
         {
-            Console.WriteLine("Running Dedox...");
+            _writer = writer;
+        }
+
+        public string Run(string text)
+        {
+            _writer.WriteLine();
 
             var tree = SyntaxTree.ParseText(text);
             var nodes = tree.GetRoot().DescendantNodes().ToList();
@@ -77,91 +85,91 @@ namespace Dedox
             {
                 if (purgeClasses.Any())
                 {
-                    Console.WriteLine("Remove XML comments from these classes:");
+                    _writer.WriteLine("Remove XML comments from these classes:");
                     foreach (var c in purgeClasses)
                     {
-                        Console.WriteLine(" - {0}", c.Identifier.ValueText);
+                        _writer.WriteLine(" - {0}", c.Identifier.ValueText);
                     }
 
-                    Console.WriteLine();
+                    _writer.WriteLine();
                 }
 
                 if (purgeInterfaces.Any())
                 {
-                    Console.WriteLine("Remove XML comments from these interfaces:");
+                    _writer.WriteLine("Remove XML comments from these interfaces:");
                     foreach (var it in purgeInterfaces)
                     {
-                        Console.WriteLine(" - {0}", it.Identifier.ValueText);
+                        _writer.WriteLine(" - {0}", it.Identifier.ValueText);
                     }
 
-                    Console.WriteLine();
+                    _writer.WriteLine();
                 }
 
                 if (purgeEnums.Any())
                 {
-                    Console.WriteLine("Remove XML comments from these enums:");
+                    _writer.WriteLine("Remove XML comments from these enums:");
                     foreach (var it in purgeEnums)
                     {
-                        Console.WriteLine(" - {0}", it.Identifier.ValueText);
+                        _writer.WriteLine(" - {0}", it.Identifier.ValueText);
                     }
 
-                    Console.WriteLine();
+                    _writer.WriteLine();
                 }
 
                 if (purgeEnumMembers.Any())
                 {
-                    Console.WriteLine("Remove XML comments from these enum members:");
+                    _writer.WriteLine("Remove XML comments from these enum members:");
                     foreach (var it in purgeEnumMembers)
                     {
-                        Console.WriteLine(" - {0}", it.Identifier.ValueText);
+                        _writer.WriteLine(" - {0}", it.Identifier.ValueText);
                     }
 
-                    Console.WriteLine();
+                    _writer.WriteLine();
                 }
 
 
                 if (purgeFields.Any())
                 {
-                    Console.WriteLine("Remove XML comments from these fields:");
+                    _writer.WriteLine("Remove XML comments from these fields:");
                     foreach (var f in purgeFields)
                     {
-                        Console.WriteLine(" - {0}", f.Declaration.Variables.First().Identifier.ValueText);
+                        _writer.WriteLine(" - {0}", f.Declaration.Variables.First().Identifier.ValueText);
                     }
 
-                    Console.WriteLine();
+                    _writer.WriteLine();
                 }
 
                 if (purgeProperties.Any())
                 {
-                    Console.WriteLine("Remove XML comments from these properties:");
+                    _writer.WriteLine("Remove XML comments from these properties:");
                     foreach (var p in purgeProperties)
                     {
-                        Console.WriteLine(" - {0}", p.Identifier.ValueText);
+                        _writer.WriteLine(" - {0}", p.Identifier.ValueText);
                     }
 
-                    Console.WriteLine();
+                    _writer.WriteLine();
                 }
 
                 if (purgeMethods.Any())
                 {
-                    Console.WriteLine("Remove XML comments from these methods:");
+                    _writer.WriteLine("Remove XML comments from these methods:");
                     foreach (var m in purgeMethods)
                     {
-                        Console.WriteLine(" - {0}", m.Identifier.ValueText);
+                        _writer.WriteLine(" - {0}", m.Identifier.ValueText);
                     }
 
-                    Console.WriteLine();
+                    _writer.WriteLine();
                 }
 
                 if (purgeCtors.Any())
                 {
-                    Console.WriteLine("Remove XML comments from these constructors:");
+                    _writer.WriteLine("Remove XML comments from these constructors:");
                     foreach (var c in purgeCtors)
                     {
-                        Console.WriteLine(" - {0}", c.Identifier.ValueText);
+                        _writer.WriteLine(" - {0}", c.Identifier.ValueText);
                     }
 
-                    Console.WriteLine();
+                    _writer.WriteLine();
                 }
 
                 var root = tree.GetRoot();
@@ -185,49 +193,47 @@ namespace Dedox
                 return newRoot.ToFullString();
             }
             
-            Console.WriteLine("Nothing to dedox.");
-
             return null;
         }
 
-        private static bool IsConstructorDocumentationGenerated(ConstructorDeclarationSyntax arg)
+        private bool IsConstructorDocumentationGenerated(ConstructorDeclarationSyntax arg)
         {
-            return new GeneratedConstructorCommentsChecker(arg).IsGenerated();
+            return new GeneratedConstructorCommentsChecker(arg, _writer).IsGenerated();
         }
 
-        private static bool IsEnumMemberDocumentationGenerated(EnumMemberDeclarationSyntax enumMemberDeclaration)
+        private bool IsEnumMemberDocumentationGenerated(EnumMemberDeclarationSyntax enumMemberDeclaration)
         {
-            return new GeneratedEnumMemberCommentsChecker(enumMemberDeclaration).IsGenerated();
+            return new GeneratedEnumMemberCommentsChecker(enumMemberDeclaration, _writer).IsGenerated();
         }
 
-        private static bool IsEnumDocumentationGenerated(EnumDeclarationSyntax enumDeclaration)
+        private bool IsEnumDocumentationGenerated(EnumDeclarationSyntax enumDeclaration)
         {
-            return new GeneratedEnumCommentsChecker(enumDeclaration).IsGenerated();
+            return new GeneratedEnumCommentsChecker(enumDeclaration, _writer).IsGenerated();
         }
 
-        private static bool IsClassDocumentationGenerated(ClassDeclarationSyntax classDeclaration)
+        private bool IsClassDocumentationGenerated(ClassDeclarationSyntax classDeclaration)
         {
-            return new GeneratedClassCommentsChecker(classDeclaration).IsGenerated();
+            return new GeneratedClassCommentsChecker(classDeclaration, _writer).IsGenerated();
         }
 
-        private static bool IsInterfaceDocumentationGenerated(InterfaceDeclarationSyntax interfaceDeclaration)
+        private bool IsInterfaceDocumentationGenerated(InterfaceDeclarationSyntax interfaceDeclaration)
         {
-            return new GeneratedInterfaceCommentsChecker(interfaceDeclaration).IsGenerated();
+            return new GeneratedInterfaceCommentsChecker(interfaceDeclaration, _writer).IsGenerated();
         }
 
-        private static bool IsFieldDocumentationGenerated(FieldDeclarationSyntax fieldDeclaration)
+        private bool IsFieldDocumentationGenerated(FieldDeclarationSyntax fieldDeclaration)
         {
-            return new GeneratedFieldCommentsChecker(fieldDeclaration).IsGenerated();
+            return new GeneratedFieldCommentsChecker(fieldDeclaration, _writer).IsGenerated();
         }
 
-        private static bool IsMethodDocumentationGenerated(MethodDeclarationSyntax methodDeclaration)
+        private bool IsMethodDocumentationGenerated(MethodDeclarationSyntax methodDeclaration)
         {
-            return new GeneratedMethodCommentsChecker(methodDeclaration).IsGenerated();
+            return new GeneratedMethodCommentsChecker(methodDeclaration, _writer).IsGenerated();
         }
 
-        private static bool IsPropertyDocumentationGenerated(PropertyDeclarationSyntax p)
+        private bool IsPropertyDocumentationGenerated(PropertyDeclarationSyntax p)
         {
-            return new GeneratedPropertyCommentsChecker(p).IsGenerated();
+            return new GeneratedPropertyCommentsChecker(p, _writer).IsGenerated();
         }
     }
 }

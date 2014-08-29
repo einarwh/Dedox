@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 using Roslyn.Compilers.CSharp;
 
@@ -6,8 +7,8 @@ namespace Dedox
 {
     class GeneratedInterfaceCommentsChecker : GeneratedCommentsChecker<InterfaceDeclarationSyntax>
     {
-        public GeneratedInterfaceCommentsChecker(InterfaceDeclarationSyntax it)
-            : base(it)
+        public GeneratedInterfaceCommentsChecker(InterfaceDeclarationSyntax it, TextWriter writer)
+            : base(it, writer)
         {
         }
 
@@ -27,11 +28,11 @@ namespace Dedox
                 var n = Name;
                 var name = n[0] == 'I' ? n.Substring(1) : n;
                 var expectedComment = string.Format("The {0} interface.", name);
-                Console.WriteLine("Expected interface comment: '{0}'", expectedComment);
+                WriteLine("Expected interface comment: '{0}'", expectedComment);
                 return expectedComment;
             }
 
-            Console.WriteLine("Unexpected tag {0} in interface comment.", tag);
+            WriteLine("Unexpected tag {0} in interface comment.", tag);
             return null;
         }
     }

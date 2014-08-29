@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -8,8 +9,8 @@ namespace Dedox
 {
     class GeneratedConstructorCommentsChecker : GeneratedCommentsChecker<ConstructorDeclarationSyntax>
     {
-        public GeneratedConstructorCommentsChecker(ConstructorDeclarationSyntax it)
-            : base(it)
+        public GeneratedConstructorCommentsChecker(ConstructorDeclarationSyntax it, TextWriter writer)
+            : base(it, writer)
         {
         }
 
@@ -39,11 +40,11 @@ namespace Dedox
                 if (match.Success)
                 {
                     var typeName = match.Groups[1].Value;
-                    Console.WriteLine("The XML comment for the returns tag is probably obsolete.");
-                    Console.WriteLine("Should be {0} but is actually {1}.", ClassTypeName, typeName);
+                    WriteLine("The XML comment for the returns tag is probably obsolete.");
+                    WriteLine("Should be {0} but is actually {1}.", ClassTypeName, typeName);
                 }
 
-                Console.WriteLine();
+                WriteLine();
             }
         }
 
@@ -53,8 +54,8 @@ namespace Dedox
 
             if ("summary".Equals(tag))
             {
-                var expectedMethodComment = string.Format("Initializes a new instance of the <see cref=\"{0}\" /> class.", ClassTypeName);
-                Console.WriteLine("Expected comment (based on class name): '{0}'", expectedMethodComment);
+                var expectedMethodComment = string.Format("Initializes a new instance of the <see cref=\"{0}\"/> class.", ClassTypeName);
+                WriteLine("Expected comment (based on class name): '{0}'", expectedMethodComment);
                 return expectedMethodComment;
             }
 
@@ -78,7 +79,7 @@ namespace Dedox
 
                 var fixedParamName = NaiveNameFixer(nameAttributeValue);
                 var expectedParamComment = string.Format("The {0}.", fixedParamName);
-                Console.WriteLine("Expected param comment: '{0}'", expectedParamComment);
+                WriteLine("Expected param comment: '{0}'", expectedParamComment);
                 return expectedParamComment;
             }
 
@@ -87,16 +88,14 @@ namespace Dedox
                 var returnTypeName = ClassTypeName;
                 if (returnTypeName == null)
                 {
-                    Console.WriteLine("Unknown content in return tag.");
+                    WriteLine("Unknown content in return tag.");
                     return null;
                 }
 
                 var expectedReturnsComment = string.Format("The <see cref=\"{0}\"/>.", returnTypeName);
-                Console.WriteLine("Expected returns comment: {0}.", expectedReturnsComment);
+                WriteLine("Expected returns comment: {0}.", expectedReturnsComment);
                 return expectedReturnsComment;
             }
-
-            // Console.WriteLine("Unexpected tag.");
 
             return null;
         }

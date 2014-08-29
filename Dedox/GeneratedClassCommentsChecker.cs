@@ -1,11 +1,13 @@
+using System.IO;
+
 using Roslyn.Compilers.CSharp;
 
 namespace Dedox
 {
     class GeneratedClassCommentsChecker : GeneratedSummaryCommentsChecker<ClassDeclarationSyntax>
     {
-        public GeneratedClassCommentsChecker(ClassDeclarationSyntax classDeclaration)
-            : base(classDeclaration)
+        public GeneratedClassCommentsChecker(ClassDeclarationSyntax classDeclaration, TextWriter writer)
+            : base(classDeclaration, writer)
         {
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 
 using Roslyn.Compilers.CSharp;
@@ -7,8 +8,8 @@ namespace Dedox
 {
     class GeneratedPropertyCommentsChecker : GeneratedCommentsChecker<PropertyDeclarationSyntax>
     {
-        public GeneratedPropertyCommentsChecker(PropertyDeclarationSyntax it)
-            : base(it)
+        public GeneratedPropertyCommentsChecker(PropertyDeclarationSyntax it, TextWriter writer)
+            : base(it, writer)
         { 
         }
 
@@ -26,18 +27,18 @@ namespace Dedox
             if ("summary".Equals(tag))
             {
                 var expectedComment = GetPredictedPropertySummaryText();
-                Console.WriteLine("Expected comment: '{0}'", expectedComment);
+                WriteLine("Expected comment: '{0}'", expectedComment);
                 return expectedComment;
             }
 
             if ("value".Equals(tag))
             {
                 var expectedComment = GetPredictedPropertyValueText();
-                Console.WriteLine("Expected comment: '{0}'", expectedComment);
+                WriteLine("Expected comment: '{0}'", expectedComment);
                 return expectedComment;
             }
 
-            Console.WriteLine("Unexpected tag {0} in property comment.", tag);
+            WriteLine("Unexpected tag {0} in property comment.", tag);
             return null;
         }
 
@@ -57,6 +58,17 @@ namespace Dedox
             var fixedName = NaiveNameFixer(Name);
 
             string summaryText = string.Format("the {0}.", fixedName);
+
+            if (It.Type.Kind == SyntaxKind.PredefinedType)
+            {
+                var predefType = (PredefinedTypeSyntax)It.Type;
+                var isBoolProperty = "bool" == predefType.Keyword.ValueText;
+                if (isBoolProperty)
+                {
+                    summaryText = "a value indicating whether " + summaryText;
+                }
+            }
+
             if (hasGetter && hasSetter)
             {
                 return "Gets or sets " + summaryText;

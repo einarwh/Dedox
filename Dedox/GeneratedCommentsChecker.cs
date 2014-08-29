@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -10,9 +11,12 @@ namespace Dedox
     {
         protected readonly T It;
 
-        protected GeneratedCommentsChecker(T it)
+        private readonly TextWriter _writer;
+
+        protected GeneratedCommentsChecker(T it, TextWriter writer)
         {
             It = it;
+            _writer = writer;
         }
 
         protected abstract string Name
@@ -37,18 +41,29 @@ namespace Dedox
             return reader.Read();
         }
 
+        protected void WriteLine(string format, params object[] args)
+        {
+            _writer.WriteLine(format, args);
+        }
+
+        protected void WriteLine()
+        {
+            _writer.WriteLine();
+        }
+
+
         public bool IsGenerated()
         {
-            Console.WriteLine();
+            WriteLine();
             var elemType = GetCodeElementType();
-            Console.WriteLine("{0}: {1}", elemType, Name);
+            //WriteLine("{0}: {1}", elemType, Name);
 
             var docTrivia = GetDocumentationTrivia();
             var st = docTrivia.GetStructure();
             if (st == null)
             {
                 // No XML comments.
-                Console.WriteLine("{0} {1} has no XML comments.", elemType, Name);
+                WriteLine("{0} {1} has no XML comments.", elemType, Name);
                 return false;
             }
 
@@ -66,7 +81,7 @@ namespace Dedox
 
                 if (expectedComment == null)
                 {
-                    Console.WriteLine("{0} {1}: Failed to produce an expectation for tag {2}.", elemType, Name, tag);
+                    WriteLine("{0} {1}: Failed to produce an expectation for tag {2}.", elemType, Name, tag);
                     return false;
                 }
 
@@ -74,12 +89,12 @@ namespace Dedox
 
                 if (!string.Equals(expectedComment, actualComment, StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine("Comment mismatch.");
-                    Console.WriteLine("Expected comment: '{0}'", expectedComment);
-                    Console.WriteLine("Actual comment: '{0}'", actualComment);
+                    WriteLine("{0} {1} has comment mismatch.", elemType, Name);
+                    WriteLine("Expected comment: '{0}'", expectedComment);
+                    WriteLine("Actual comment: '{0}'", actualComment);
 
                     var dist = LevenshteinDistance.Compute(expectedComment, actualComment);
-                    Console.WriteLine("Levenshtein distance: " + dist);
+                    WriteLine("Levenshtein distance: " + dist);
 
                     OnMismatch(tag, expectedComment, actualComment);
 
@@ -87,7 +102,7 @@ namespace Dedox
                 }
             }
 
-            Console.WriteLine("All the documentation for {0} {1} was written by a tool.", elemType, Name);
+            WriteLine("All the documentation for {0} {1} was written by a tool.", elemType, Name);
 
             return true;
         }

@@ -1,11 +1,13 @@
-﻿using Roslyn.Compilers.CSharp;
+﻿using System.IO;
+
+using Roslyn.Compilers.CSharp;
 
 namespace Dedox
 {
     class GeneratedEnumCommentsChecker : GeneratedSummaryCommentsChecker<EnumDeclarationSyntax>
     {
-        public GeneratedEnumCommentsChecker(EnumDeclarationSyntax it)
-            : base(it)
+        public GeneratedEnumCommentsChecker(EnumDeclarationSyntax it, TextWriter writer)
+            : base(it, writer)
         {
         }
 
