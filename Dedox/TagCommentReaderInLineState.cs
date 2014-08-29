@@ -11,7 +11,9 @@ namespace Dedox
 
         protected override ITagCommentReaderState AcceptXmlText(XmlTextSyntax syntax)
         {
-            StateMachine.AddText(ReadText(syntax));
+            var text = ReadText(syntax);
+            var paddedText = text.Length > 1 ? " " + text : text;
+            StateMachine.AddText(paddedText);
             return new TagCommentReaderNewLineState(StateMachine);
         }
 
