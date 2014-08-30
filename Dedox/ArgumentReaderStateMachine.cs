@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Dedox
 {
-    public class ArgumentReaderStateMachine
+    public class ArgumentReaderStateMachine : IDedoxConfig
     {
         private IArgumentReaderState _state;
 
@@ -24,6 +24,8 @@ namespace Dedox
 
         public string OutputDirectory { get; set; }
 
+        public TextWriter Writer { get; set; }
+
         public void AddInputFile(string s)
         {
             var file = new FileInfo(s);
@@ -39,5 +41,16 @@ namespace Dedox
         {
             return _files.ToList();
         } 
+    }
+
+    public interface IDedoxConfig
+    {
+        bool Verbose { get; set; }
+
+        string OutputDirectory { get; set; }
+
+        TextWriter Writer { get; set; }
+
+        List<FileInfo> GetInputFiles();
     }
 }

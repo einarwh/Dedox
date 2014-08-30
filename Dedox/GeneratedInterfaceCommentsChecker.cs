@@ -7,8 +7,8 @@ namespace Dedox
 {
     class GeneratedInterfaceCommentsChecker : GeneratedCommentsChecker<InterfaceDeclarationSyntax>
     {
-        public GeneratedInterfaceCommentsChecker(InterfaceDeclarationSyntax it, TextWriter writer)
-            : base(it, writer)
+        public GeneratedInterfaceCommentsChecker(InterfaceDeclarationSyntax it, IDedoxConfig config)
+            : base(it, config)
         {
         }
 

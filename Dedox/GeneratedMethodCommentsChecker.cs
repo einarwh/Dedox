@@ -9,8 +9,8 @@ namespace Dedox
 {
     class GeneratedMethodCommentsChecker : GeneratedCommentsChecker<MethodDeclarationSyntax>
     {
-        public GeneratedMethodCommentsChecker(MethodDeclarationSyntax it, TextWriter writer)
-            : base(it, writer)
+        public GeneratedMethodCommentsChecker(MethodDeclarationSyntax it, IDedoxConfig config)
+            : base(it, config)
         {
         }
 

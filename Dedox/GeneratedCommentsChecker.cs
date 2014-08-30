@@ -11,12 +11,15 @@ namespace Dedox
     {
         protected readonly T It;
 
+        private readonly IDedoxConfig _config;
         private readonly TextWriter _writer;
 
-        protected GeneratedCommentsChecker(T it, TextWriter writer)
+        protected GeneratedCommentsChecker(T it, IDedoxConfig config)
         {
             It = it;
-            _writer = writer;
+
+            _config = config;
+            _writer = config.Writer;
         }
 
         protected abstract string Name
@@ -64,8 +67,13 @@ namespace Dedox
             {
                 // No XML comments.
                 WriteLine("{0} {1} has no XML comments.", elemType, Name);
+
+                // TODO: Count not documented?
+
                 return false;
             }
+
+            // TODO: Count documented?
 
             var childNodes = st.ChildNodes();
             var maybeXmlElements = childNodes.Where(n => n.Kind == SyntaxKind.XmlElement);
@@ -101,6 +109,8 @@ namespace Dedox
                     return false;
                 }
             }
+
+            // TODO: Count tool documented?
 
             WriteLine("All the documentation for {0} {1} was written by a tool.", elemType, Name);
 

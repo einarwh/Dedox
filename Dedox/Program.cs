@@ -92,52 +92,63 @@ class C
 
             Run(config);
 
-            
-
             Console.ReadKey();
         }
 
-        private static void Run(ArgumentReaderStateMachine config)
+        private static void Run(IDedoxConfig config)
         {
             Console.WriteLine("Verbose? " + config.Verbose);
             Console.WriteLine("Output dir? " + config.OutputDirectory);
-
             var tw = config.Verbose ? Console.Out : new StringWriter(new StringBuilder());
+            config.Writer = tw;
 
             var inputFiles = config.GetInputFiles();
             if (inputFiles.Any())
             {
                 foreach (var inputFile in config.GetInputFiles())
                 {
-                    ProcessInputFile(inputFile, tw);
+                    ProcessInputFile(inputFile, config);
                 }
             }
             else
             {
-                var sampleOutput = new Dedoxifier(tw).Run(GetSampleProgram());
+                var sampleOutput = new Dedoxifier(config).Run(GetSampleProgram());
                 tw.WriteLine(sampleOutput);
             }
         }
 
-        private static void ProcessInputFile(FileInfo inputFile, TextWriter tw)
+        private static void ProcessInputFile(FileInfo inputFile, IDedoxConfig config)
         {
+            var tw = config.Writer;
+
             if (inputFile.Exists)
             {
                 tw.WriteLine("Processing file: " + inputFile.Name);
 
                 if (inputFile.Name.EndsWith(".csproj"))
                 {
-                    AnalyzeProject(inputFile, tw);
+                    AnalyzeProject(inputFile, config);
                 }
                 else if (inputFile.Name.EndsWith(".cs"))
                 {
-                    var output = new Dedoxifier(tw).Run(File.ReadAllText(inputFile.FullName));
-                    tw.WriteLine(output);
+                    AnalyzeCodeFile(inputFile, config);
                 }
             }
             else
             {
                 Console.WriteLine("No such file: " + inputFile.FullName);
+            }
+        }
+
+        private static void AnalyzeCodeFile(FileInfo inputFile, IDedoxConfig config)
+        {
+            var source = File.ReadAllText(inputFile.FullName);
+            var output = new Dedoxifier(config).Run(source);
+            if (output != null)
+            {
+                var outDir = config.OutputDirectory ?? inputFile.DirectoryName ?? @"C:\temp";
+                var outFile = Path.Combine(outDir, inputFile.Name);
+                File.WriteAllText(outFile, output);
             }
         }
 
@@ -156,7 +167,7 @@ class C
             return files;
         } 
 
-        private static void AnalyzeProject(FileInfo projectFile, TextWriter tw)
+        private static void AnalyzeProject(FileInfo projectFile, IDedoxConfig config)
         {
             var dir = projectFile.Directory;
             if (dir == null)
@@ -164,19 +175,14 @@ class C
                 return;
             }
 
-            var filePaths = GetCodeFilesFromProjectFile(projectFile)
+            var fileInfos = GetCodeFilesFromProjectFile(projectFile)
                 .Select(file => Path.Combine(dir.FullName, file))
+                .Select(filePath => new FileInfo(filePath))
                 .ToList();
 
-            foreach (var filePath in filePaths)
+            foreach (var file in fileInfos)
             {
-                var result = new Dedoxifier(tw).Run(File.ReadAllText(filePath));
-
-                if (result != null)
-                {
-                    // Output dedox file. 
-                    Console.WriteLine(result);
-                }
+                AnalyzeCodeFile(file, config);
             }
         }
     }

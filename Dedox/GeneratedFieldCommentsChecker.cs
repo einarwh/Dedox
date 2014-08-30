@@ -1,14 +1,11 @@
-﻿using System;
-using System.IO;
-
-using Roslyn.Compilers.CSharp;
+﻿using Roslyn.Compilers.CSharp;
 
 namespace Dedox
 {
     class GeneratedFieldCommentsChecker : GeneratedSummaryCommentsChecker<FieldDeclarationSyntax>
     {
-        public GeneratedFieldCommentsChecker(FieldDeclarationSyntax fieldDeclaration, TextWriter writer)
-            : base(fieldDeclaration, writer)
+        public GeneratedFieldCommentsChecker(FieldDeclarationSyntax fieldDeclaration, IDedoxConfig config)
+            : base(fieldDeclaration, config)
         {
         }
 

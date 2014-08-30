@@ -9,11 +9,13 @@ namespace Dedox
 {
     public class Dedoxifier
     {
+        private readonly IDedoxConfig _config;
         private readonly TextWriter _writer;
 
-        public Dedoxifier(TextWriter writer)
+        public Dedoxifier(IDedoxConfig config)
         {
-            _writer = writer;
+            _config = config;
+            _writer = config.Writer;
         }
 
         public string Run(string text)
@@ -196,44 +198,44 @@ namespace Dedox
             return null;
         }
 
-        private bool IsConstructorDocumentationGenerated(ConstructorDeclarationSyntax arg)
+        private bool IsConstructorDocumentationGenerated(ConstructorDeclarationSyntax declaration)
         {
-            return new GeneratedConstructorCommentsChecker(arg, _writer).IsGenerated();
+            return new GeneratedConstructorCommentsChecker(declaration, _config).IsGenerated();
         }
 
-        private bool IsEnumMemberDocumentationGenerated(EnumMemberDeclarationSyntax enumMemberDeclaration)
+        private bool IsEnumMemberDocumentationGenerated(EnumMemberDeclarationSyntax declaration)
         {
-            return new GeneratedEnumMemberCommentsChecker(enumMemberDeclaration, _writer).IsGenerated();
+            return new GeneratedEnumMemberCommentsChecker(declaration, _config).IsGenerated();
         }
 
-        private bool IsEnumDocumentationGenerated(EnumDeclarationSyntax enumDeclaration)
+        private bool IsEnumDocumentationGenerated(EnumDeclarationSyntax declaration)
         {
-            return new GeneratedEnumCommentsChecker(enumDeclaration, _writer).IsGenerated();
+            return new GeneratedEnumCommentsChecker(declaration, _config).IsGenerated();
         }
 
-        private bool IsClassDocumentationGenerated(ClassDeclarationSyntax classDeclaration)
+        private bool IsClassDocumentationGenerated(ClassDeclarationSyntax declaration)
         {
-            return new GeneratedClassCommentsChecker(classDeclaration, _writer).IsGenerated();
+            return new GeneratedClassCommentsChecker(declaration, _config).IsGenerated();
         }
 
-        private bool IsInterfaceDocumentationGenerated(InterfaceDeclarationSyntax interfaceDeclaration)
+        private bool IsInterfaceDocumentationGenerated(InterfaceDeclarationSyntax declaration)
         {
-            return new GeneratedInterfaceCommentsChecker(interfaceDeclaration, _writer).IsGenerated();
+            return new GeneratedInterfaceCommentsChecker(declaration, _config).IsGenerated();
         }
 
-        private bool IsFieldDocumentationGenerated(FieldDeclarationSyntax fieldDeclaration)
+        private bool IsFieldDocumentationGenerated(FieldDeclarationSyntax declaration)
         {
-            return new GeneratedFieldCommentsChecker(fieldDeclaration, _writer).IsGenerated();
+            return new GeneratedFieldCommentsChecker(declaration, _config).IsGenerated();
         }
 
-        private bool IsMethodDocumentationGenerated(MethodDeclarationSyntax methodDeclaration)
+        private bool IsMethodDocumentationGenerated(MethodDeclarationSyntax declaration)
         {
-            return new GeneratedMethodCommentsChecker(methodDeclaration, _writer).IsGenerated();
+            return new GeneratedMethodCommentsChecker(declaration, _config).IsGenerated();
         }
 
-        private bool IsPropertyDocumentationGenerated(PropertyDeclarationSyntax p)
+        private bool IsPropertyDocumentationGenerated(PropertyDeclarationSyntax declaration)
         {
-            return new GeneratedPropertyCommentsChecker(p, _writer).IsGenerated();
+            return new GeneratedPropertyCommentsChecker(declaration, _config).IsGenerated();
         }
     }
 }
