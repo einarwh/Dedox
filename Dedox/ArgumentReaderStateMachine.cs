@@ -6,6 +6,8 @@ namespace Dedox
 {
     public class ArgumentReaderStateMachine : IDedoxConfig
     {
+        private const int DefaultLevenshteinLimit = 2;
+
         private IArgumentReaderState _state;
 
         private readonly List<FileInfo> _files = new List<FileInfo>(); 
@@ -13,6 +15,8 @@ namespace Dedox
         public ArgumentReaderStateMachine()
         {
             _state = new ArgumentReaderState(this);
+
+            LevenshteinLimit = DefaultLevenshteinLimit; 
         }
 
         public void Accept(string arg)
@@ -24,7 +28,11 @@ namespace Dedox
 
         public string OutputDirectory { get; set; }
 
+        public int LevenshteinLimit { get; set; }
+
         public TextWriter Writer { get; set; }
+
+        public bool Metrics { get; set; }
 
         public void AddInputFile(string s)
         {

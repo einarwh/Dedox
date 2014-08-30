@@ -97,10 +97,15 @@ class C
 
         private static void Run(IDedoxConfig config)
         {
-            Console.WriteLine("Verbose? " + config.Verbose);
-            Console.WriteLine("Output dir? " + config.OutputDirectory);
             var tw = config.Verbose ? Console.Out : new StringWriter(new StringBuilder());
+            
             config.Writer = tw;
+
+            tw.WriteLine("Verbose? " + config.Verbose);
+            tw.WriteLine("Output dir? " + config.OutputDirectory);
+            tw.WriteLine("Levenshtein? " + config.LevenshteinLimit);
+            tw.WriteLine("Metrics? " + config.Metrics);
+            tw.WriteLine();
 
             var metrics = new DedoxMetrics();
 
@@ -118,9 +123,13 @@ class C
                 tw.WriteLine(sampleOutput);
             }
 
-            tw.WriteLine("Code elements: " + metrics.CodeElements);
-            tw.WriteLine("Code elements (documented): " + metrics.CodeElementsWithDocumentation);
-            tw.WriteLine("Code elements (generated): " + metrics.CodeElementsWithGeneratedDocumentation);
+            if (config.Metrics)
+            {
+                // Always write to console, even in non-verbose mode.
+                Console.WriteLine("Code elements: " + metrics.CodeElements);
+                Console.WriteLine("Code elements (documented): " + metrics.CodeElementsWithDocumentation);
+                Console.WriteLine("Code elements (generated): " + metrics.CodeElementsWithGeneratedDocumentation);                
+            }
         }
 
         private static void ProcessInputFile(FileInfo inputFile, IDedoxConfig config, IDedoxMetrics metrics)
@@ -148,6 +157,8 @@ class C
 
         private static void AnalyzeCodeFile(FileInfo inputFile, IDedoxConfig config, IDedoxMetrics metrics)
         {
+            config.Writer.WriteLine("Processing code file {0}.", inputFile.Name);
+
             var source = File.ReadAllText(inputFile.FullName);
             var output = new Dedoxifier(config, metrics).Run(source);
             if (output != null)
@@ -156,6 +167,8 @@ class C
                 var outFile = Path.Combine(outDir, inputFile.Name);
                 File.WriteAllText(outFile, output);
             }
+
+            config.Writer.WriteLine();
         }
 
         private static List<string> GetCodeFilesFromProjectFile(FileInfo projectFile)

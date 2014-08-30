@@ -20,41 +20,38 @@ namespace Dedox
             }
         }
 
-        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
+        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
         {
             var tag = startTag.Name.LocalName.ValueText;
             if ("summary".Equals(tag))
             {
-                var expectedComment = GetPredictedPropertySummaryText();
-                WriteLine("Expected comment: '{0}'", expectedComment);
-                return expectedComment;
+                return GetPredictedPropertySummaryText(nameTransform);
             }
 
             if ("value".Equals(tag))
             {
-                var expectedComment = GetPredictedPropertyValueText();
-                WriteLine("Expected comment: '{0}'", expectedComment);
-                return expectedComment;
+                return GetPredictedPropertyValueText(nameTransform);
             }
 
             WriteLine("Unexpected tag {0} in property comment.", tag);
+
             return null;
         }
 
-        private string GetPredictedPropertyValueText()
+        private string GetPredictedPropertyValueText(Func<string, string> nameTransform)
         {
-            var name = NaiveNameFixer(Name);
+            var name = nameTransform(Name);
             return string.Format("The {0}.", name);
         }
 
-        private string GetPredictedPropertySummaryText()
+        private string GetPredictedPropertySummaryText(Func<string, string> nameTransform)
         {
             Func<string, bool> hasAccessor =
                 accessorName => It.AccessorList.Accessors.Any(ads => accessorName.Equals(ads.Keyword.ValueText));
             bool hasGetter = hasAccessor("get");
             bool hasSetter = hasAccessor("set");
 
-            var fixedName = NaiveNameFixer(Name);
+            var fixedName = nameTransform(Name);
 
             string summaryText = string.Format("the {0}.", fixedName);
 
@@ -64,7 +61,7 @@ namespace Dedox
                 var isBoolProperty = "bool" == predefType.Keyword.ValueText;
                 if (isBoolProperty)
                 {
-                    summaryText = "a value indicating whether " + summaryText;
+                    summaryText = string.Format("a value indicating whether " + summaryText);
                 }
             }
 

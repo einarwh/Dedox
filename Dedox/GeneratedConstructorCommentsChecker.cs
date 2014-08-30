@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -48,13 +49,16 @@ namespace Dedox
 
         protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
+            return GetExpectedCommentForTag(startTag, NaiveDecomposer);
+        }
+
+        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
+        {
             string tag = startTag.Name.LocalName.ValueText;
 
             if ("summary".Equals(tag))
             {
-                var expectedMethodComment = string.Format("Initializes a new instance of the <see cref=\"{0}\"/> class.", ClassTypeName);
-                WriteLine("Expected comment (based on class name): '{0}'", expectedMethodComment);
-                return expectedMethodComment;
+                return string.Format("Initializes a new instance of the <see cref=\"{0}\"/> class.", ClassTypeName);
             }
 
             if ("param".Equals(tag))
@@ -75,10 +79,7 @@ namespace Dedox
                     }
                 }
 
-                var fixedParamName = NaiveNameFixer(nameAttributeValue);
-                var expectedParamComment = string.Format("The {0}.", fixedParamName);
-                WriteLine("Expected param comment: '{0}'", expectedParamComment);
-                return expectedParamComment;
+                return string.Format("The {0}.", NaiveDecomposer(nameAttributeValue));
             }
 
             if ("returns".Equals(tag))
@@ -90,9 +91,7 @@ namespace Dedox
                     return null;
                 }
 
-                var expectedReturnsComment = string.Format("The <see cref=\"{0}\"/>.", returnTypeName);
-                WriteLine("Expected returns comment: {0}.", expectedReturnsComment);
-                return expectedReturnsComment;
+                return string.Format("The <see cref=\"{0}\"/>.", returnTypeName);
             }
 
             return null;

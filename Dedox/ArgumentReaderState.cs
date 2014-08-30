@@ -1,5 +1,3 @@
-using System;
-
 namespace Dedox
 {
     class ArgumentReaderState : IArgumentReaderState
@@ -15,14 +13,23 @@ namespace Dedox
         {
             if ("-v".Equals(arg))
             {
-                Console.WriteLine("Flag verbose.");
                 _machine.Verbose = true;
                 return this;
             }
 
+            if ("-m".Equals(arg))
+            {
+                _machine.Metrics = true;
+                return this;
+            }
+
+            if ("-l".Equals(arg))
+            {
+                return new LevenshteinLimitArgumentReaderState(_machine);
+            }
+
             if ("-o".Equals(arg))
             {
-                Console.WriteLine("Ready to accept output dir.");
                 return new SetOutputDirectoryArgumentReaderState(_machine);
             }
 

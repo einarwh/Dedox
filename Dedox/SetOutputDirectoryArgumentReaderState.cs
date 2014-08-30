@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace Dedox
 {
@@ -14,8 +13,6 @@ namespace Dedox
 
         public IArgumentReaderState Accept(string arg)
         {
-            Console.WriteLine("Output dir: " + arg);
-
             var dir = new DirectoryInfo(arg);
             if (!dir.Exists)
             {

@@ -1,4 +1,6 @@
-﻿using Roslyn.Compilers.CSharp;
+﻿using System;
+
+using Roslyn.Compilers.CSharp;
 
 namespace Dedox
 {
@@ -9,18 +11,18 @@ namespace Dedox
         {
         }
 
-        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
+        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
         {
             var tag = startTag.Name.LocalName.ValueText;
             if ("summary".Equals(tag))
             {
-                var expectedComment = string.Format("The {0}.", NaiveNameFixer(Name));
-                WriteLine("Expected comment: '{0}'", expectedComment);
-                return expectedComment;
+                return string.Format("The {0}.", nameTransform(Name));
             }
 
             WriteLine("Unexpected tag {0} in comment.", tag);
+            
             return null;
         }
+
     }
 }

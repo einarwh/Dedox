@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -66,16 +67,13 @@ namespace Dedox
             return null;
         }
 
-        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
+        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
         {
             string tag = startTag.Name.LocalName.ValueText;
 
             if ("summary".Equals(tag))
             {
-                var fixedMethodName = NaiveNameFixer(Name);
-                var expectedMethodComment = string.Format("The {0}.", fixedMethodName);
-                WriteLine("Expected method comment (based on method name): '{0}'", expectedMethodComment);
-                return expectedMethodComment;
+                return string.Format("The {0}.", nameTransform(Name));
             }
 
             if ("param".Equals(tag))
@@ -96,10 +94,8 @@ namespace Dedox
                     }
                 }
 
-                var fixedParamName = NaiveNameFixer(nameAttributeValue);
-                var expectedParamComment = string.Format("The {0}.", fixedParamName);
-                WriteLine("Expected param comment: '{0}'", expectedParamComment);
-                return expectedParamComment;
+                var fixedParamName = NaiveDecomposer(nameAttributeValue);
+                return string.Format("The {0}.", fixedParamName);
             }
 
             if ("returns".Equals(tag))
