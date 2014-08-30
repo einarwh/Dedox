@@ -9,8 +9,8 @@ namespace Dedox
 {
     class GeneratedConstructorCommentsChecker : GeneratedCommentsChecker<ConstructorDeclarationSyntax>
     {
-        public GeneratedConstructorCommentsChecker(ConstructorDeclarationSyntax it, IDedoxConfig config)
-            : base(it, config)
+        public GeneratedConstructorCommentsChecker(ConstructorDeclarationSyntax it, IDedoxConfig config, IDedoxMetrics metrics)
+            : base(it, config, metrics)
         {
         }
 

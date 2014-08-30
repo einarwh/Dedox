@@ -7,8 +7,8 @@ namespace Dedox
 {
     abstract class GeneratedSummaryCommentsChecker<T> : GeneratedCommentsChecker<T> where T : SyntaxNode
     {
-        protected GeneratedSummaryCommentsChecker(T it, IDedoxConfig config)
-            : base(it, config)
+        protected GeneratedSummaryCommentsChecker(T it, IDedoxConfig config, IDedoxMetrics metrics)
+            : base(it, config, metrics)
         {
         }
 

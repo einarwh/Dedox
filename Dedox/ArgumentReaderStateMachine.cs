@@ -42,15 +42,4 @@ namespace Dedox
             return _files.ToList();
         } 
     }
-
-    public interface IDedoxConfig
-    {
-        bool Verbose { get; set; }
-
-        string OutputDirectory { get; set; }
-
-        TextWriter Writer { get; set; }
-
-        List<FileInfo> GetInputFiles();
-    }
 }

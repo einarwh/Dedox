@@ -102,22 +102,28 @@ class C
             var tw = config.Verbose ? Console.Out : new StringWriter(new StringBuilder());
             config.Writer = tw;
 
+            var metrics = new DedoxMetrics();
+
             var inputFiles = config.GetInputFiles();
             if (inputFiles.Any())
             {
                 foreach (var inputFile in config.GetInputFiles())
                 {
-                    ProcessInputFile(inputFile, config);
+                    ProcessInputFile(inputFile, config, metrics);
                 }
             }
             else
             {
-                var sampleOutput = new Dedoxifier(config).Run(GetSampleProgram());
+                var sampleOutput = new Dedoxifier(config, metrics).Run(GetSampleProgram());
                 tw.WriteLine(sampleOutput);
             }
+
+            tw.WriteLine("Code elements: " + metrics.CodeElements);
+            tw.WriteLine("Code elements (documented): " + metrics.CodeElementsWithDocumentation);
+            tw.WriteLine("Code elements (generated): " + metrics.CodeElementsWithGeneratedDocumentation);
         }
 
-        private static void ProcessInputFile(FileInfo inputFile, IDedoxConfig config)
+        private static void ProcessInputFile(FileInfo inputFile, IDedoxConfig config, IDedoxMetrics metrics)
         {
             var tw = config.Writer;
 
@@ -127,11 +133,11 @@ class C
 
                 if (inputFile.Name.EndsWith(".csproj"))
                 {
-                    AnalyzeProject(inputFile, config);
+                    AnalyzeProject(inputFile, config, metrics);
                 }
                 else if (inputFile.Name.EndsWith(".cs"))
                 {
-                    AnalyzeCodeFile(inputFile, config);
+                    AnalyzeCodeFile(inputFile, config, metrics);
                 }
             }
             else
@@ -140,10 +146,10 @@ class C
             }
         }
 
-        private static void AnalyzeCodeFile(FileInfo inputFile, IDedoxConfig config)
+        private static void AnalyzeCodeFile(FileInfo inputFile, IDedoxConfig config, IDedoxMetrics metrics)
         {
             var source = File.ReadAllText(inputFile.FullName);
-            var output = new Dedoxifier(config).Run(source);
+            var output = new Dedoxifier(config, metrics).Run(source);
             if (output != null)
             {
                 var outDir = config.OutputDirectory ?? inputFile.DirectoryName ?? @"C:\temp";
@@ -167,7 +173,7 @@ class C
             return files;
         } 
 
-        private static void AnalyzeProject(FileInfo projectFile, IDedoxConfig config)
+        private static void AnalyzeProject(FileInfo projectFile, IDedoxConfig config, IDedoxMetrics metrics)
         {
             var dir = projectFile.Directory;
             if (dir == null)
@@ -182,7 +188,7 @@ class C
 
             foreach (var file in fileInfos)
             {
-                AnalyzeCodeFile(file, config);
+                AnalyzeCodeFile(file, config, metrics);
             }
         }
     }

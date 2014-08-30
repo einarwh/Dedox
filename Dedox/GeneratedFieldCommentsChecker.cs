@@ -4,8 +4,8 @@ namespace Dedox
 {
     class GeneratedFieldCommentsChecker : GeneratedSummaryCommentsChecker<FieldDeclarationSyntax>
     {
-        public GeneratedFieldCommentsChecker(FieldDeclarationSyntax fieldDeclaration, IDedoxConfig config)
-            : base(fieldDeclaration, config)
+        public GeneratedFieldCommentsChecker(FieldDeclarationSyntax it, IDedoxConfig config, IDedoxMetrics metrics)
+            : base(it, config, metrics)
         {
         }
 

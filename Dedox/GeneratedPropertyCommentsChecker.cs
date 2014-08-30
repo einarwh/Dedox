@@ -8,8 +8,8 @@ namespace Dedox
 {
     class GeneratedPropertyCommentsChecker : GeneratedCommentsChecker<PropertyDeclarationSyntax>
     {
-        public GeneratedPropertyCommentsChecker(PropertyDeclarationSyntax it, IDedoxConfig config)
-            : base(it, config)
+        public GeneratedPropertyCommentsChecker(PropertyDeclarationSyntax it, IDedoxConfig config, IDedoxMetrics metrics)
+            : base(it, config, metrics)
         { 
         }
 

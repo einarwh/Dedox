@@ -6,8 +6,8 @@ namespace Dedox
 {
     class GeneratedEnumMemberCommentsChecker : GeneratedSummaryCommentsChecker<EnumMemberDeclarationSyntax>
     {
-        public GeneratedEnumMemberCommentsChecker(EnumMemberDeclarationSyntax it, IDedoxConfig config)
-            : base(it, config)
+        public GeneratedEnumMemberCommentsChecker(EnumMemberDeclarationSyntax it, IDedoxConfig config, IDedoxMetrics metrics)
+            : base(it, config, metrics)
         {
         }
 

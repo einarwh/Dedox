@@ -6,8 +6,8 @@ namespace Dedox
 {
     class GeneratedClassCommentsChecker : GeneratedSummaryCommentsChecker<ClassDeclarationSyntax>
     {
-        public GeneratedClassCommentsChecker(ClassDeclarationSyntax classDeclaration, IDedoxConfig config)
-            : base(classDeclaration, config)
+        public GeneratedClassCommentsChecker(ClassDeclarationSyntax classDeclaration, IDedoxConfig config, IDedoxMetrics metrics)
+            : base(classDeclaration, config, metrics)
         {
         }
 

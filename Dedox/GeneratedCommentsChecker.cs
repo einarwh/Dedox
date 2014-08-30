@@ -12,14 +12,17 @@ namespace Dedox
         protected readonly T It;
 
         private readonly IDedoxConfig _config;
+        private readonly IDedoxMetrics _metrics;
         private readonly TextWriter _writer;
 
-        protected GeneratedCommentsChecker(T it, IDedoxConfig config)
+        protected GeneratedCommentsChecker(T it, IDedoxConfig config, IDedoxMetrics metrics)
         {
             It = it;
 
             _config = config;
             _writer = config.Writer;
+
+            _metrics = metrics;
         }
 
         protected abstract string Name
@@ -57,6 +60,8 @@ namespace Dedox
 
         public bool IsGenerated()
         {
+            _metrics.IncrementCodeElements();
+            
             WriteLine();
             var elemType = GetCodeElementType();
             //WriteLine("{0}: {1}", elemType, Name);
@@ -73,7 +78,7 @@ namespace Dedox
                 return false;
             }
 
-            // TODO: Count documented?
+            _metrics.IncrementCodeElementsWithDocumentation();
 
             var childNodes = st.ChildNodes();
             var maybeXmlElements = childNodes.Where(n => n.Kind == SyntaxKind.XmlElement);
@@ -110,7 +115,7 @@ namespace Dedox
                 }
             }
 
-            // TODO: Count tool documented?
+            _metrics.IncrementCodeElementsWithGeneratedDocumentation();
 
             WriteLine("All the documentation for {0} {1} was written by a tool.", elemType, Name);
 
