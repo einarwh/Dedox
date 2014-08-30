@@ -11,7 +11,7 @@ namespace Dedox
     {
         private static string GetSampleProgram()
         {
-            var text = @"
+            const string text = @"
 using System;
 class C
 {

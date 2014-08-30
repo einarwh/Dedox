@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-using Roslyn.Compilers.CSharp;
+﻿using Roslyn.Compilers.CSharp;
 
 namespace Dedox
 {

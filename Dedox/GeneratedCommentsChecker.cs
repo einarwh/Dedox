@@ -11,7 +11,6 @@ namespace Dedox
     {
         protected readonly T It;
 
-        private readonly IDedoxConfig _config;
         private readonly IDedoxMetrics _metrics;
         private readonly TextWriter _writer;
 
@@ -19,9 +18,7 @@ namespace Dedox
         {
             It = it;
 
-            _config = config;
             _writer = config.Writer;
-
             _metrics = metrics;
         }
 

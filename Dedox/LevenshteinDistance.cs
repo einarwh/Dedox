@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dedox
 {
@@ -15,7 +11,7 @@ namespace Dedox
         {
             int n = s.Length;
             int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
+            var d = new int[n + 1, m + 1];
 
             // Step 1
             if (n == 0)
