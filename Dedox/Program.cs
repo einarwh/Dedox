@@ -91,8 +91,6 @@ class C
             }
 
             Run(config);
-
-            Console.ReadKey();
         }
 
         private static void Run(IDedoxConfig config)
@@ -140,7 +138,11 @@ class C
             {
                 tw.WriteLine("Processing file: " + inputFile.Name);
 
-                if (inputFile.Name.EndsWith(".csproj"))
+                if (inputFile.Name.EndsWith(".sln"))
+                {
+                    AnalyzeSolution(inputFile, config, metrics);
+                }
+                else if (inputFile.Name.EndsWith(".csproj"))
                 {
                     AnalyzeProject(inputFile, config, metrics);
                 }
@@ -152,6 +154,31 @@ class C
             else
             {
                 Console.WriteLine("No such file: " + inputFile.FullName);
+            }
+        }
+
+        private static void AnalyzeSolution(FileInfo inputFile, IDedoxConfig config, IDedoxMetrics metrics)
+        {
+            var dir = inputFile.Directory;
+            if (dir != null)
+            {
+                var projects =
+                    File.ReadAllLines(inputFile.FullName)
+                        .Where(s => s.StartsWith("Project("))
+                        .Select(s => s.Split('=')[1].Trim().Split(',')[1].Trim())
+                        .Select(s => s.Substring(1, s.Length - 2))
+                        .Where(s => s.EndsWith(".csproj"))
+                        .ToList();
+
+                foreach (var p in projects)
+                {
+                    var projectPath = Path.Combine(dir.FullName, p);
+                    var projectFileInfo = new FileInfo(projectPath);
+                    if (projectFileInfo.Exists)
+                    {
+                        AnalyzeProject(projectFileInfo, config, metrics);                        
+                    }
+                }
             }
         }
 
