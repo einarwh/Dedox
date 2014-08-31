@@ -31,11 +31,12 @@ namespace Dedox
                 if (match.Success)
                 {
                     var typeName = match.Groups[1].Value;
-                    Info("The XML comment for the returns tag is probably obsolete.");
-                    Info("Should be {0} but is actually {1}.", GetTypeNameForReturnsComment(), typeName);
+                    
+                    Info();
+                    Info("{0} {1}", GetCodeElementType(), Name);
+                    Info("! The XML comment for the returns tag is probably obsolete.");
+                    Info("! Should be {0} but is actually {1}.", GetTypeNameForReturnsComment(), typeName);
                 }
-
-                Info();
             }
         }
 
@@ -118,6 +119,20 @@ namespace Dedox
                     // Unexpected attribute.
                     return new List<Func<string>>();
                 }
+            }
+
+            // Sanity check for attribute value.
+            var paramExists =
+                It.ParameterList.Parameters.Any(
+                    ps =>
+                    string.Equals(
+                        ps.Identifier.ValueText,
+                        paramNameFromAttribute,
+                        StringComparison.InvariantCultureIgnoreCase));
+
+            if (!paramExists)
+            {
+                Info("! The method {0} does not have a parameter named {1}.", It.Identifier.ValueText, paramNameFromAttribute);                
             }
 
             var decomposedParamName = StyleCopDecompose(paramNameFromAttribute);

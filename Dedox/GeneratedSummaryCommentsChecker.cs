@@ -21,15 +21,17 @@ namespace Dedox
                 // Pattern: The $(name).
                 // Pattern: The $(name) $(decomposed-element-type-name).
                 // Pattern: The $(decomposed-name) $(decomposed-element-type-name).
+                // Pattern: $(element-type-name) $(name).
                 var decomposed = StyleCopDecompose(Name);
-                var decomposedElementType = StyleCopDecompose(GetCodeElementType());
+                var elemType = GetCodeElementType();
+                var decomposedElementType = StyleCopDecompose(elemType);
                 var list = new List<Func<string>>
                                {
                                    () => string.Format("The {0}.", decomposed),
                                    () => string.Format("The {0}.", Name),
-                                   () =>
-                                   string.Format("The {0} {1}.", decomposed, decomposedElementType),
-                                   () => string.Format("The {0} {1}.", Name, decomposedElementType)
+                                   () => string.Format("The {0} {1}.", decomposed, decomposedElementType),
+                                   () => string.Format("The {0} {1}.", Name, decomposedElementType),
+                                   () => string.Format("{0} {1}.", elemType, Name)
                                };
                 return list;
             }
