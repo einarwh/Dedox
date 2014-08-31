@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -104,11 +104,7 @@ namespace Dedox
                     hasSummaryTag = true;
                 }
 
-                var commentGenerators = new Func<string>[]
-                                            {
-                                                () => GetExpectedCommentForTag(startTag, StyleCopDecompose),
-                                                () => GetExpectedCommentForTag(startTag)
-                                            };
+                var commentGenerators = GetExpectedCommentForTag(startTag);
 
                 var levenshteins = new List<Tuple<string, int>>();
                 bool found = false;
@@ -121,14 +117,20 @@ namespace Dedox
 
                         if (expectedComment != null)
                         {
-                            if (string.Equals(expectedComment, actualComment, StringComparison.OrdinalIgnoreCase))
+                            string lowerExpected = expectedComment.ToLowerInvariant();
+                            string lowerActual = actualComment.ToLowerInvariant();
+                            if (string.Equals(lowerExpected, lowerActual))
                             {
                                 found = true;
                             }
                             else
                             {
-                                var distance = LevenshteinDistance.Compute(expectedComment, actualComment);
-                                levenshteins.Add(Tuple.Create(expectedComment, distance));
+                                int diffLength = actualComment.Length - expectedComment.Length;
+                                if (diffLength <= _config.LevenshteinLimit)
+                                {
+                                    var distance = LevenshteinDistance.Compute(lowerExpected, lowerActual);
+                                    levenshteins.Add(Tuple.Create(expectedComment, distance));                                    
+                                }
                                 OnMismatch(tag, expectedComment, actualComment);
                             }
                         }
@@ -143,12 +145,16 @@ namespace Dedox
                     Info("The comment was '{0}'", actualComment);
                     
                     var best = levenshteins.OrderBy(t => t.Item2).FirstOrDefault();
-                    if (best != null)
+                    if (best == null)
+                    {
+                        Info("The generated guesses were not even close.");
+                    }
+                    else
                     {
                         var bestComment = best.Item1;
                         var bestDistance = best.Item2;
 
-                        Info("Best comment has Levenshtein distance {1}: '{0}'", bestComment, bestDistance);
+                        Info("Best guess has Levenshtein distance {1}: '{0}'", bestComment, bestDistance);
 
                         if (bestDistance <= _config.LevenshteinLimit)
                         {
@@ -163,6 +169,10 @@ namespace Dedox
                     Info("No acceptable comment found.");
                     return false;
                 }
+
+                Debug();
+                Debug("{0} {1}", elemType, Name);
+                Debug("Reproduced comment for tag {0}: '{1}'", tag, actualComment);
             }
 
             if (!hasSummaryTag)
@@ -177,8 +187,8 @@ namespace Dedox
 
             Info();
             Info("{0} {1}", elemType, Name);
-            Info("The documentation was written by a tool.");
-
+            Info("All the documentation was written by a tool.");
+            
             return true;
         }
 
@@ -191,13 +201,8 @@ namespace Dedox
         // Patterns are sorted in order of priority.
         // Patterns are Func<SOMETHING (everything needed to build pattern), string>.
         // SOMETHING must contain (funcs to get) name, decomposed name, declaring type...
-        protected virtual string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
-        {
-            return GetExpectedCommentForTag(startTag, n => n);
-        }
-
-        protected abstract string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform);
-
+        protected abstract List<Func<string>> GetExpectedCommentForTag(XmlElementStartTagSyntax startTag);
+       
         protected string SplitCamelCase(string input)
         {
             // Better expression: "(?<=[a-z])([A-Z])"

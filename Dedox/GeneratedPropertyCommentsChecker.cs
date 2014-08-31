@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Roslyn.Compilers.CSharp;
@@ -20,64 +21,69 @@ namespace Dedox
             }
         }
 
-        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
+        protected override List<Func<string>> GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
             var tag = startTag.Name.LocalName.ValueText;
             if ("summary".Equals(tag))
             {
-                return GetPredictedPropertySummaryText(nameTransform);
+                return GetPredictedPropertySummaryText();
             }
 
             if ("value".Equals(tag))
             {
-                return GetPredictedPropertyValueText(nameTransform);
+                return GetPredictedPropertyValueText();
             }
 
             Info("Unexpected tag {0} in property comment.", tag);
 
-            return null;
+            return new List<Func<string>>();
         }
 
-        private string GetPredictedPropertyValueText(Func<string, string> nameTransform)
+        private List<Func<string>> GetPredictedPropertyValueText()
         {
-            var name = nameTransform(Name);
-            return string.Format("The {0}.", name);
+            return new List<Func<string>>
+                       {
+                           () => string.Format("The {0}.", StyleCopDecompose(Name)),
+                           () => string.Format("The {0}.", Name)
+                       };
         }
 
-        private string GetPredictedPropertySummaryText(Func<string, string> nameTransform)
+        private List<Func<string>> GetPredictedPropertySummaryText()
         {
             Func<string, bool> hasAccessor =
                 accessorName => It.AccessorList.Accessors.Any(ads => accessorName.Equals(ads.Keyword.ValueText));
             bool hasGetter = hasAccessor("get");
             bool hasSetter = hasAccessor("set");
 
-            var fixedName = nameTransform(Name);
+            var decomposedName = StyleCopDecompose(Name);
 
-            string summaryText = string.Format("the {0}.", fixedName);
-
+            bool isBoolProperty = false;
             if (It.Type.Kind == SyntaxKind.PredefinedType)
             {
                 var predefType = (PredefinedTypeSyntax)It.Type;
-                var isBoolProperty = "bool" == predefType.Keyword.ValueText;
-                if (isBoolProperty)
-                {
-                    summaryText = string.Format("a value indicating whether " + summaryText);
-                }
+                isBoolProperty = "bool" == predefType.Keyword.ValueText;
             }
+
+            var boolText = isBoolProperty ? " a value indicating whether" : "";
+            var basicList = new List<Func<string>>
+                                {
+                                    () => string.Format("{1} the {0}.", decomposedName, boolText),
+                                    () => string.Format("{1} {0}.", decomposedName, boolText)
+                                };
 
             if (hasGetter && hasSetter)
             {
-                return "Gets or sets " + summaryText;
+                return basicList.Select(g => (Func<string>)(() => "Gets or sets" + g())).ToList();
             }
 
             if (hasGetter)
             {
-                return "Gets " + summaryText;
+                return basicList.Select(g => (Func<string>)(() => "Gets" + g())).ToList();
             }
 
             if (hasSetter)
             {
-                return "Sets " + summaryText;
+                return basicList.Select(g => (Func<string>)(() => "Sets" + g())).ToList();
             }
 
             throw new Exception("This makes no sense.");

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -67,57 +68,79 @@ namespace Dedox
             return null;
         }
 
-        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
+        protected override List<Func<string>> GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
             string tag = startTag.Name.LocalName.ValueText;
 
             if ("summary".Equals(tag))
             {
-                // Pattern: The $(decomposed-name).
-                // Alternative: The $(name).
-                // Alternative: GhostDoc-style conjugation of verb: FooBar => Fooes the bar.
-                // Alternative with parameters: GhostDoc-style: FooBar(thing) => Fooes the bar given the specified thing.
-                return string.Format("The {0}.", nameTransform(Name));
+                return ExpectedCommentForSummaryTag();
             }
 
             if ("param".Equals(tag))
             {
-
-                string nameAttributeValue = "";
-                foreach (var a in startTag.Attributes)
-                {
-                    var attrName = a.Name.LocalName.ValueText;
-                    var attrValue = string.Join("", a.TextTokens.Select(t => t.ValueText));
-                    if ("name".Equals(attrName))
-                    {
-                        nameAttributeValue = attrValue;
-                    }
-                    else
-                    {
-                        // Unexpected attribute.
-                        return null;
-                    }
-                }
-
-                var fixedParamName = StyleCopDecompose(nameAttributeValue);
-                return string.Format("The {0}.", fixedParamName);
+                return ExpectedCommentForParamTag(startTag);
             }
 
             if ("returns".Equals(tag))
             {
-                var returnTypeName = GetTypeNameForReturnsComment();
-                if (returnTypeName == null)
-                {
-                    Info("Unknown content in return tag.");
-                    return null;
-                }
-
-                var expectedReturnsComment = string.Format("The <see cref=\"{0}\"/>.", returnTypeName);
-                Info("Expected returns comment: {0}.", expectedReturnsComment);
-                return expectedReturnsComment;
+                return ExpectedCommentForReturnsTag();
             }
 
-            return null;
+            return new List<Func<string>>();
+        }
+
+        private List<Func<string>> ExpectedCommentForReturnsTag()
+        {
+            var returnTypeName = GetTypeNameForReturnsComment();
+            if (returnTypeName == null)
+            {
+                Info("Unknown content in return tag.");
+                return new List<Func<string>>();
+            }
+
+            return new List<Func<string>> { () => string.Format("The <see cref=\"{0}\"/>.", returnTypeName) };
+        }
+
+        private List<Func<string>> ExpectedCommentForParamTag(XmlElementStartTagSyntax startTag)
+        {
+            string paramNameFromAttribute = "";
+            foreach (var a in startTag.Attributes)
+            {
+                var attrName = a.Name.LocalName.ValueText;
+                var attrValue = string.Join("", a.TextTokens.Select(t => t.ValueText));
+                if ("name".Equals(attrName))
+                {
+                    paramNameFromAttribute = attrValue;
+                }
+                else
+                {
+                    // Unexpected attribute.
+                    return new List<Func<string>>();
+                }
+            }
+
+            var decomposedParamName = StyleCopDecompose(paramNameFromAttribute);
+
+            return new List<Func<string>>
+                       {
+                           () => string.Format("The {0}.", decomposedParamName),
+                           () => string.Format("The {0}.", paramNameFromAttribute)
+                       };
+        }
+
+        private List<Func<string>> ExpectedCommentForSummaryTag()
+        {
+            // Pattern: The $(decomposed-name).
+            // Alternative: The $(name).
+            // Alternative: GhostDoc-style conjugation of verb: FooBar => Fooes the bar.
+            // Alternative with parameters: GhostDoc-style: FooBar(thing) => Fooes the bar given the specified thing.
+
+            return new List<Func<string>>
+                       {
+                           () => string.Format("The {0}.", StyleCopDecompose(Name)),
+                           () => string.Format("The {0}.", Name)
+                       };
         }
     }
 }

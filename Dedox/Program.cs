@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 
+using Roslyn.Compilers.CSharp;
+
 namespace Dedox
 {
     internal class Program
@@ -187,6 +189,7 @@ class C
 
                 foreach (var p in projects)
                 {
+                    config.Writer.Info();
                     var projectPath = Path.Combine(dir.FullName, p);
                     var projectFileInfo = new FileInfo(projectPath);
                     if (projectFileInfo.Exists)

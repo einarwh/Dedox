@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Roslyn.Compilers.CSharp;
 
@@ -19,7 +20,7 @@ namespace Dedox
             }
         }
 
-        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
+        protected override List<Func<string>> GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
             var tag = startTag.Name.LocalName.ValueText;
             if ("summary".Equals(tag))
@@ -28,13 +29,22 @@ namespace Dedox
                 // Pattern: The $(decomposed-name) interface.
                 // Pattern: The $(name).
                 // Pattern: The $(decomposed-name).
-                var n = Name;
-                var name = n[0] == 'I' ? n.Substring(1) : n;
-                return string.Format("The {0} interface.", nameTransform(name));
+                var stylecopChoppedName = Name.Substring(1);
+                var list = new List<Func<string>>
+                               {
+                                   () => string.Format("The {0} interface.", stylecopChoppedName),
+                                   () =>
+                                   string.Format(
+                                       "The {0} interface.",
+                                       StyleCopDecompose(stylecopChoppedName)),
+                                   () => string.Format("The {0}.", Name),
+                                   () => string.Format("The {0}.", StyleCopDecompose(Name))
+                               };
+                return list;
             }
 
             Info("Unexpected tag {0} in interface comment.", tag);
-            return null;
+            return new List<Func<string>>();
         }
     }
 }

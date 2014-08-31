@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -47,54 +48,71 @@ namespace Dedox
             }
         }
 
-        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
-        {
-            return GetExpectedCommentForTag(startTag, StyleCopDecompose);
-        }
-
-        protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
+        protected override List<Func<string>> GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
             string tag = startTag.Name.LocalName.ValueText;
 
             if ("summary".Equals(tag))
             {
-                return string.Format("Initializes a new instance of the <see cref=\"{0}\"/> class.", ClassTypeName);
+                return ExpectedCommentForSummaryTag();
             }
 
             if ("param".Equals(tag))
             {
-                string nameAttributeValue = "";
-                foreach (var a in startTag.Attributes)
-                {
-                    var attrName = a.Name.LocalName.ValueText;
-                    var attrValue = string.Join("", a.TextTokens.Select(t => t.ValueText));
-                    if ("name".Equals(attrName))
-                    {
-                        nameAttributeValue = attrValue;
-                    }
-                    else
-                    {
-                        // Unexpected attribute.
-                        return null;
-                    }
-                }
-
-                return string.Format("The {0}.", StyleCopDecompose(nameAttributeValue));
+                return ExpectedCommentForParamTag(startTag);
             }
 
             if ("returns".Equals(tag))
             {
-                var returnTypeName = ClassTypeName;
-                if (returnTypeName == null)
-                {
-                    Info("Unknown content in return tag.");
-                    return null;
-                }
-
-                return string.Format("The <see cref=\"{0}\"/>.", returnTypeName);
+                return ExpectedCommentForReturnsTag();
             }
 
-            return null;
+            return new List<Func<string>>();
+        }
+
+        private List<Func<string>> ExpectedCommentForSummaryTag()
+        {
+            var list = new List<Func<string>>
+                           {
+                               () =>
+                               string.Format(
+                                   "Initializes a new instance of the <see cref=\"{0}\"/> class.",
+                                   ClassTypeName)
+                           };
+            return list;
+        }
+
+        private List<Func<string>> ExpectedCommentForParamTag(XmlElementStartTagSyntax startTag)
+        {
+            string nameAttributeValue = "";
+            foreach (var a in startTag.Attributes)
+            {
+                var attrName = a.Name.LocalName.ValueText;
+                var attrValue = string.Join("", a.TextTokens.Select(t => t.ValueText));
+                if ("name".Equals(attrName))
+                {
+                    nameAttributeValue = attrValue;
+                }
+                else
+                {
+                    // Unexpected attribute.
+                    return new List<Func<string>>();
+                }
+            }
+
+            return new List<Func<string>> { () => string.Format("The {0}.", StyleCopDecompose(nameAttributeValue)) };
+        }
+
+        private List<Func<string>> ExpectedCommentForReturnsTag()
+        {
+            var returnTypeName = ClassTypeName;
+            if (returnTypeName == null)
+            {
+                Info("Unknown content in return tag.");
+                return new List<Func<string>>();
+            }
+
+            return new List<Func<string>> { () => string.Format("The <see cref=\"{0}\"/>.", returnTypeName) };
         }
     }
 }
