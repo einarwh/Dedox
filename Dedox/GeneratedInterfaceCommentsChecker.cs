@@ -24,6 +24,10 @@ namespace Dedox
             var tag = startTag.Name.LocalName.ValueText;
             if ("summary".Equals(tag))
             {
+                // Pattern: The $(name) interface.
+                // Pattern: The $(decomposed-name) interface.
+                // Pattern: The $(name).
+                // Pattern: The $(decomposed-name).
                 var n = Name;
                 var name = n[0] == 'I' ? n.Substring(1) : n;
                 return string.Format("The {0} interface.", nameTransform(name));

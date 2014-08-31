@@ -73,11 +73,16 @@ namespace Dedox
 
             if ("summary".Equals(tag))
             {
+                // Pattern: The $(decomposed-name).
+                // Alternative: The $(name).
+                // Alternative: GhostDoc-style conjugation of verb: FooBar => Fooes the bar.
+                // Alternative with parameters: GhostDoc-style: FooBar(thing) => Fooes the bar given the specified thing.
                 return string.Format("The {0}.", nameTransform(Name));
             }
 
             if ("param".Equals(tag))
             {
+
                 string nameAttributeValue = "";
                 foreach (var a in startTag.Attributes)
                 {
@@ -94,7 +99,7 @@ namespace Dedox
                     }
                 }
 
-                var fixedParamName = NaiveDecomposer(nameAttributeValue);
+                var fixedParamName = StyleCopDecompose(nameAttributeValue);
                 return string.Format("The {0}.", fixedParamName);
             }
 

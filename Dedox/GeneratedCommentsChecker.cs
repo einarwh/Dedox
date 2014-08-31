@@ -106,7 +106,7 @@ namespace Dedox
 
                 var commentGenerators = new Func<string>[]
                                             {
-                                                () => GetExpectedCommentForTag(startTag, NaiveDecomposer),
+                                                () => GetExpectedCommentForTag(startTag, StyleCopDecompose),
                                                 () => GetExpectedCommentForTag(startTag)
                                             };
 
@@ -186,6 +186,11 @@ namespace Dedox
         {
         }
 
+        // TODO: Make this entirely pattern-driven. 
+        // Select patterns based on code element and tag. 
+        // Patterns are sorted in order of priority.
+        // Patterns are Func<SOMETHING (everything needed to build pattern), string>.
+        // SOMETHING must contain (funcs to get) name, decomposed name, declaring type...
         protected virtual string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
             return GetExpectedCommentForTag(startTag, n => n);
@@ -199,7 +204,7 @@ namespace Dedox
             return Regex.Replace(input, "([A-Z])", " $1", RegexOptions.Compiled).Trim();
         }
 
-        protected string NaiveDecomposer(string input)
+        protected string StyleCopDecompose(string input)
         {
             var lowercased = SplitCamelCase(input).Split(' ').Select(s => s.ToLower());
             return string.Join(" ", lowercased);

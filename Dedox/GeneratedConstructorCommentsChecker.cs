@@ -49,7 +49,7 @@ namespace Dedox
 
         protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
-            return GetExpectedCommentForTag(startTag, NaiveDecomposer);
+            return GetExpectedCommentForTag(startTag, StyleCopDecompose);
         }
 
         protected override string GetExpectedCommentForTag(XmlElementStartTagSyntax startTag, Func<string, string> nameTransform)
@@ -79,7 +79,7 @@ namespace Dedox
                     }
                 }
 
-                return string.Format("The {0}.", NaiveDecomposer(nameAttributeValue));
+                return string.Format("The {0}.", StyleCopDecompose(nameAttributeValue));
             }
 
             if ("returns".Equals(tag))
