@@ -112,7 +112,6 @@ namespace Dedox
                 {
                     if (!found)
                     {
-                        // Particular
                         var expectedComment = generator();
 
                         if (expectedComment != null)
@@ -166,7 +165,7 @@ namespace Dedox
 
                 if (!found)
                 {
-                    Info("No acceptable comment found.");
+                    Info("No acceptable guess found.");
                     return false;
                 }
 
