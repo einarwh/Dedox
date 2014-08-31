@@ -33,7 +33,7 @@ namespace Dedox
                 return GetPredictedPropertyValueText(nameTransform);
             }
 
-            WriteLine("Unexpected tag {0} in property comment.", tag);
+            Info("Unexpected tag {0} in property comment.", tag);
 
             return null;
         }

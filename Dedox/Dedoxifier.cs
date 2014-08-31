@@ -10,7 +10,7 @@ namespace Dedox
     {
         private readonly IDedoxConfig _config;
         private readonly IDedoxMetrics _metrics;
-        private readonly TextWriter _writer;
+        private readonly IConsoleWriter _writer;
 
         public Dedoxifier(IDedoxConfig config, IDedoxMetrics metrics)
         {
@@ -84,94 +84,94 @@ namespace Dedox
 
             if (purgeMembers.Any())
             {
-                WriteLine();
+                Info();
 
                 if (purgeClasses.Any())
                 {
-                    WriteLine("Remove XML comments from these classes:");
+                    Info("Remove XML comments from these classes:");
                     foreach (var c in purgeClasses)
                     {
-                        WriteLine(" - {0}", c.Identifier.ValueText);
+                        Info(" - {0}", c.Identifier.ValueText);
                     }
 
-                    WriteLine();
+                    Info();
                 }
 
                 if (purgeInterfaces.Any())
                 {
-                    WriteLine("Remove XML comments from these interfaces:");
+                    Info("Remove XML comments from these interfaces:");
                     foreach (var it in purgeInterfaces)
                     {
-                        WriteLine(" - {0}", it.Identifier.ValueText);
+                        Info(" - {0}", it.Identifier.ValueText);
                     }
 
-                    WriteLine();
+                    Info();
                 }
 
                 if (purgeEnums.Any())
                 {
-                    WriteLine("Remove XML comments from these enums:");
+                    Info("Remove XML comments from these enums:");
                     foreach (var it in purgeEnums)
                     {
-                        WriteLine(" - {0}", it.Identifier.ValueText);
+                        Info(" - {0}", it.Identifier.ValueText);
                     }
 
-                    WriteLine();
+                    Info();
                 }
 
                 if (purgeEnumMembers.Any())
                 {
-                    WriteLine("Remove XML comments from these enum members:");
+                    Info("Remove XML comments from these enum members:");
                     foreach (var it in purgeEnumMembers)
                     {
-                        WriteLine(" - {0}", it.Identifier.ValueText);
+                        Info(" - {0}", it.Identifier.ValueText);
                     }
 
-                    WriteLine();
+                    Info();
                 }
 
                 if (purgeFields.Any())
                 {
-                    WriteLine("Remove XML comments from these fields:");
+                    Info("Remove XML comments from these fields:");
                     foreach (var f in purgeFields)
                     {
-                        WriteLine(" - {0}", f.Declaration.Variables.First().Identifier.ValueText);
+                        Info(" - {0}", f.Declaration.Variables.First().Identifier.ValueText);
                     }
 
-                    WriteLine();
+                    Info();
                 }
 
                 if (purgeProperties.Any())
                 {
-                    WriteLine("Remove XML comments from these properties:");
+                    Info("Remove XML comments from these properties:");
                     foreach (var p in purgeProperties)
                     {
-                        WriteLine(" - {0}", p.Identifier.ValueText);
+                        Info(" - {0}", p.Identifier.ValueText);
                     }
 
-                    WriteLine();
+                    Info();
                 }
 
                 if (purgeMethods.Any())
                 {
-                    WriteLine("Remove XML comments from these methods:");
+                    Info("Remove XML comments from these methods:");
                     foreach (var m in purgeMethods)
                     {
-                        WriteLine(" - {0}", m.Identifier.ValueText);
+                        Info(" - {0}", m.Identifier.ValueText);
                     }
 
-                    WriteLine();
+                    Info();
                 }
 
                 if (purgeCtors.Any())
                 {
-                    WriteLine("Remove XML comments from these constructors:");
+                    Info("Remove XML comments from these constructors:");
                     foreach (var c in purgeCtors)
                     {
-                        WriteLine(" - {0}", c.Identifier.ValueText);
+                        Info(" - {0}", c.Identifier.ValueText);
                     }
 
-                    WriteLine();
+                    Info();
                 }
 
                 var root = tree.GetRoot();
@@ -238,14 +238,14 @@ namespace Dedox
             return new GeneratedPropertyCommentsChecker(declaration, _config, _metrics).IsGenerated();
         }
 
-        private void WriteLine(string format, params object[] args)
+        private void Info(string format, params object[] args)
         {
-            _writer.WriteLine(format, args);
+            _writer.Info(format, args);
         }
 
-        private void WriteLine()
+        private void Info()
         {
-            _writer.WriteLine();
+            _writer.Info();
         }
     }
 }

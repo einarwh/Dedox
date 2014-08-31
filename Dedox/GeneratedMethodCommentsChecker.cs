@@ -30,11 +30,11 @@ namespace Dedox
                 if (match.Success)
                 {
                     var typeName = match.Groups[1].Value;
-                    WriteLine("The XML comment for the returns tag is probably obsolete.");
-                    WriteLine("Should be {0} but is actually {1}.", GetTypeNameForReturnsComment(), typeName);
+                    Info("The XML comment for the returns tag is probably obsolete.");
+                    Info("Should be {0} but is actually {1}.", GetTypeNameForReturnsComment(), typeName);
                 }
 
-                WriteLine();
+                Info();
             }
         }
 
@@ -63,7 +63,7 @@ namespace Dedox
                 return genericName.Identifier.ValueText;
             }
 
-            WriteLine("Unknown return type kind: " + ret.Kind);
+            Info("Unknown return type kind: " + ret.Kind);
             return null;
         }
 
@@ -103,12 +103,12 @@ namespace Dedox
                 var returnTypeName = GetTypeNameForReturnsComment();
                 if (returnTypeName == null)
                 {
-                    WriteLine("Unknown content in return tag.");
+                    Info("Unknown content in return tag.");
                     return null;
                 }
 
                 var expectedReturnsComment = string.Format("The <see cref=\"{0}\"/>.", returnTypeName);
-                WriteLine("Expected returns comment: {0}.", expectedReturnsComment);
+                Info("Expected returns comment: {0}.", expectedReturnsComment);
                 return expectedReturnsComment;
             }
 

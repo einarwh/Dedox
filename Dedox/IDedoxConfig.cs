@@ -13,7 +13,9 @@ namespace Dedox
 
         int LevenshteinLimit { get; set; }
 
-        TextWriter Writer { get; set; }
+        IConsoleWriter Writer { get; set; }
+
+        bool VeryVerbose { get; set; }
 
         List<FileInfo> GetInputFiles();
     }

@@ -26,11 +26,13 @@ namespace Dedox
 
         public bool Verbose { get; set; }
 
+        public bool VeryVerbose { get; set; }
+
         public string OutputDirectory { get; set; }
 
         public int LevenshteinLimit { get; set; }
 
-        public TextWriter Writer { get; set; }
+        public IConsoleWriter Writer { get; set; }
 
         public bool Metrics { get; set; }
 

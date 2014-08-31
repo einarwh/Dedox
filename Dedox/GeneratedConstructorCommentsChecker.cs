@@ -39,11 +39,11 @@ namespace Dedox
                 if (match.Success)
                 {
                     var typeName = match.Groups[1].Value;
-                    WriteLine("The XML comment for the returns tag is probably obsolete.");
-                    WriteLine("Should be {0} but is actually {1}.", ClassTypeName, typeName);
+                    Info("The XML comment for the returns tag is probably obsolete.");
+                    Info("Should be {0} but is actually {1}.", ClassTypeName, typeName);
                 }
 
-                WriteLine();
+                Info();
             }
         }
 
@@ -87,7 +87,7 @@ namespace Dedox
                 var returnTypeName = ClassTypeName;
                 if (returnTypeName == null)
                 {
-                    WriteLine("Unknown content in return tag.");
+                    Info("Unknown content in return tag.");
                     return null;
                 }
 

@@ -26,12 +26,10 @@ namespace Dedox
             {
                 var n = Name;
                 var name = n[0] == 'I' ? n.Substring(1) : n;
-                var expectedComment = string.Format("The {0} interface.", nameTransform(name));
-                WriteLine("Expected interface comment: '{0}'", expectedComment);
-                return expectedComment;
+                return string.Format("The {0} interface.", nameTransform(name));
             }
 
-            WriteLine("Unexpected tag {0} in interface comment.", tag);
+            Info("Unexpected tag {0} in interface comment.", tag);
             return null;
         }
     }

@@ -93,17 +93,32 @@ class C
             Run(config);
         }
 
+        private static IConsoleWriter GetConsoleWriter(IDedoxConfig config)
+        {
+            if (config.VeryVerbose)
+            {
+                return new DebugConsoleWriter(Console.Out);
+            }
+
+            if (config.Verbose)
+            {
+                return new InfoConsoleWriter(Console.Out);
+            }
+
+            return new NullConsoleWriter();
+        }
+
         private static void Run(IDedoxConfig config)
         {
-            var tw = config.Verbose ? Console.Out : new StringWriter(new StringBuilder());
+            IConsoleWriter writer = GetConsoleWriter(config);
             
-            config.Writer = tw;
+            config.Writer = writer;
 
-            tw.WriteLine("Verbose? " + config.Verbose);
-            tw.WriteLine("Output dir? " + config.OutputDirectory);
-            tw.WriteLine("Levenshtein? " + config.LevenshteinLimit);
-            tw.WriteLine("Metrics? " + config.Metrics);
-            tw.WriteLine();
+            writer.Debug("Verbose? " + config.Verbose);
+            writer.Debug("Output dir? " + config.OutputDirectory);
+            writer.Debug("Levenshtein? " + config.LevenshteinLimit);
+            writer.Debug("Metrics? " + config.Metrics);
+            writer.Debug();
 
             var metrics = new DedoxMetrics();
 
@@ -118,7 +133,7 @@ class C
             else
             {
                 var sampleOutput = new Dedoxifier(config, metrics).Run(GetSampleProgram());
-                tw.WriteLine(sampleOutput);
+                Console.WriteLine(sampleOutput);
             }
 
             if (config.Metrics)
@@ -132,11 +147,11 @@ class C
 
         private static void ProcessInputFile(FileInfo inputFile, IDedoxConfig config, IDedoxMetrics metrics)
         {
-            var tw = config.Writer;
+            var writer = config.Writer;
 
             if (inputFile.Exists)
             {
-                tw.WriteLine("Processing file: " + inputFile.Name);
+                writer.Info("Processing file: " + inputFile.Name);
 
                 if (inputFile.Name.EndsWith(".sln"))
                 {
@@ -153,7 +168,7 @@ class C
             }
             else
             {
-                Console.WriteLine("No such file: " + inputFile.FullName);
+                writer.Info("No such file: " + inputFile.FullName);
             }
         }
 
@@ -184,7 +199,7 @@ class C
 
         private static void AnalyzeCodeFile(FileInfo inputFile, IDedoxConfig config, IDedoxMetrics metrics)
         {
-            config.Writer.WriteLine("Processing code file {0}.", inputFile.Name);
+            config.Writer.Info("> Processing code file {0}.", inputFile.Name);
 
             var source = File.ReadAllText(inputFile.FullName);
             var output = new Dedoxifier(config, metrics).Run(source);
@@ -195,7 +210,8 @@ class C
                 File.WriteAllText(outFile, output);
             }
 
-            config.Writer.WriteLine();
+            config.Writer.Info();
+            config.Writer.Info();
         }
 
         private static List<string> GetCodeFilesFromProjectFile(FileInfo projectFile)

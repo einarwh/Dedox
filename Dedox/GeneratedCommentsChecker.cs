@@ -8,13 +8,13 @@ using Roslyn.Compilers.CSharp;
 
 namespace Dedox
 {
-    abstract class GeneratedCommentsChecker<T> : IGeneratedCommentsChecker where T : SyntaxNode
+    abstract class GeneratedCommentsChecker<T> : IGeneratedCommentsChecker, IConsoleWriter where T : SyntaxNode
     {
         protected readonly T It;
 
         private readonly IDedoxConfig _config;
         private readonly IDedoxMetrics _metrics;
-        private readonly TextWriter _writer;
+        private readonly IConsoleWriter _writer;
 
         protected GeneratedCommentsChecker(T it, IDedoxConfig config, IDedoxMetrics metrics)
         {
@@ -47,31 +47,40 @@ namespace Dedox
             return reader.Read();
         }
 
-        protected void WriteLine(string format, params object[] args)
+        public void Info(string format, params object[] args)
         {
-            _writer.WriteLine(format, args);
+            _writer.Info(format, args);
         }
 
-        protected void WriteLine()
+        public void Info()
         {
-            _writer.WriteLine();
+            _writer.Info();
         }
 
+        public void Debug(string format, params object[] args)
+        {
+            _writer.Debug(format, args);
+        }
+
+        public void Debug()
+        {
+            _writer.Debug();
+        }
 
         public bool IsGenerated()
         {
             _metrics.IncrementCodeElements();
             
-            WriteLine();
             var elemType = GetCodeElementType();
-            WriteLine("{0} {1}", elemType, Name);
 
             var docTrivia = GetDocumentationTrivia();
             var st = docTrivia.GetStructure();
             if (st == null)
             {
                 // No XML comments.
-                WriteLine("No XML comments.");
+                Debug();
+                Debug("{0} {1}", elemType, Name);
+                Debug("No XML comments.");
 
                 return false;
             }
@@ -128,19 +137,22 @@ namespace Dedox
 
                 if (!found)
                 {
-                    WriteLine("Unable to reproduce the comment.");
-                    WriteLine("The comment was '{0}'", actualComment);
+                    Info();
+                    Info("{0} {1}", elemType, Name);
+                    Info("Unable to reproduce the comment for tag '{0}'.", tag);
+                    Info("The comment was '{0}'", actualComment);
+                    
                     var best = levenshteins.OrderBy(t => t.Item2).FirstOrDefault();
                     if (best != null)
                     {
                         var bestComment = best.Item1;
                         var bestDistance = best.Item2;
 
-                        WriteLine("Best comment has Levenshtein distance {1}: '{0}'", bestComment, bestDistance);
+                        Info("Best comment has Levenshtein distance {1}: '{0}'", bestComment, bestDistance);
 
                         if (bestDistance <= _config.LevenshteinLimit)
                         {
-                            WriteLine("The Levenshtein distance is within the specified limit.");
+                            Info("The Levenshtein distance is within the specified limit.");
                             found = true;
                         }
                     }
@@ -148,20 +160,24 @@ namespace Dedox
 
                 if (!found)
                 {
-                    WriteLine("No acceptable comment found.");
+                    Info("No acceptable comment found.");
                     return false;
                 }
             }
 
             if (!hasSummaryTag)
             {
-                WriteLine("No summary tag found.");
+                Debug();
+                Debug("{0} {1}", elemType, Name);
+                Debug("No summary tag found.");
                 return false;
             }
 
             _metrics.IncrementCodeElementsWithGeneratedDocumentation();
 
-            WriteLine("The documentation for was written by a tool.");
+            Info();
+            Info("{0} {1}", elemType, Name);
+            Info("The documentation was written by a tool.");
 
             return true;
         }

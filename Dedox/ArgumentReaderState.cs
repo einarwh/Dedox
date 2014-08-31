@@ -17,6 +17,13 @@ namespace Dedox
                 return this;
             }
 
+            if ("-vv".Equals(arg))
+            {
+                _machine.VeryVerbose = true;
+                return this;
+            }
+
+
             if ("-m".Equals(arg))
             {
                 _machine.Metrics = true;

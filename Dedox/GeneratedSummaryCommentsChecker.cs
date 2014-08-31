@@ -19,7 +19,7 @@ namespace Dedox
                 return string.Format("The {0}.", nameTransform(Name));
             }
 
-            WriteLine("Unexpected tag {0} in comment.", tag);
+            Info("Unexpected tag {0} in comment.", tag);
             
             return null;
         }

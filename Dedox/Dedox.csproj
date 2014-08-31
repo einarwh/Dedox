@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="ArgumentReaderState.cs" />
     <Compile Include="ArgumentReaderStateMachine.cs" />
+    <Compile Include="DebugConsoleWriter.cs" />
     <Compile Include="Dedoxifier.cs" />
     <Compile Include="DedoxMetrics.cs" />
     <Compile Include="GeneratedClassCommentsChecker.cs" />
@@ -77,13 +78,16 @@
     <Compile Include="GeneratedPropertyCommentsChecker.cs" />
     <Compile Include="GeneratedSummaryCommentsChecker.cs" />
     <Compile Include="IArgumentReaderState.cs" />
+    <Compile Include="IConsoleWriter.cs" />
     <Compile Include="IDedoxConfig.cs" />
     <Compile Include="IDedoxMetrics.cs" />
     <Compile Include="IGeneratedCommentsChecker.cs" />
+    <Compile Include="InfoConsoleWriter.cs" />
     <Compile Include="InputFilesArgumentReaderState.cs" />
     <Compile Include="ITagCommentReaderState.cs" />
     <Compile Include="LevenshteinDistance.cs" />
     <Compile Include="LevenshteinLimitArgumentReaderState.cs" />
+    <Compile Include="NullConsoleWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SetOutputDirectoryArgumentReaderState.cs" />
