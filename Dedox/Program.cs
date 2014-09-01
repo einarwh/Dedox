@@ -141,7 +141,8 @@ class C
             if (config.Metrics)
             {
                 // Always write to console, even in non-verbose mode.
-                Console.WriteLine("Code elements: " + metrics.CodeElements);
+                Console.WriteLine("Code elements (all): " + metrics.AllCodeElements);
+                Console.WriteLine("Code elements (included): " + metrics.CodeElements);
                 Console.WriteLine("Code elements (documented): " + metrics.CodeElementsWithDocumentation);
                 Console.WriteLine("Code elements (generated): " + metrics.CodeElementsWithGeneratedDocumentation);                
             }

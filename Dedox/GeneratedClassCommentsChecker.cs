@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+
 using Roslyn.Compilers.CSharp;
 
 namespace Dedox
@@ -23,6 +26,11 @@ namespace Dedox
             {
                 return It.Identifier.ValueText;
             }
+        }
+
+        protected override bool IsGeneratedCodeElement()
+        {
+            return IsGeneratedCodeElement(It);
         }
     }
 }

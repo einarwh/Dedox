@@ -9,6 +9,8 @@ namespace Dedox
 
         bool Metrics { get; set; }
 
+        bool IncludeGeneratedCode { get; set; }
+
         string OutputDirectory { get; set; }
 
         int LevenshteinLimit { get; set; }

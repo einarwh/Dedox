@@ -2,9 +2,18 @@
 {
     internal class DedoxMetrics : IDedoxMetrics
     {
+        private int _allCodeElements;
         private int _codeElements;
         private int _codeElementsWithDocumentation;
         private int _codeElementsWithGeneratedDocumentation;
+
+        public int AllCodeElements
+        {
+            get
+            {
+                return _allCodeElements;
+            }
+        }
 
         public int CodeElements
         {
@@ -43,6 +52,11 @@
         public void IncrementCodeElementsWithGeneratedDocumentation()
         {
             ++_codeElementsWithGeneratedDocumentation;
+        }
+
+        public void IncrementAllCodeElements()
+        {
+            ++_allCodeElements;
         }
     }
 }

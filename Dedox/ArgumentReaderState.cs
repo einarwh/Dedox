@@ -23,6 +23,11 @@ namespace Dedox
                 return this;
             }
 
+            if ("-g".Equals(arg))
+            {
+                _machine.IncludeGeneratedCode = true;
+                return this;
+            }
 
             if ("-m".Equals(arg))
             {

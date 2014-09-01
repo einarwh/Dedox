@@ -69,6 +69,13 @@ namespace Dedox
 
         public bool IsGenerated()
         {
+            _metrics.IncrementAllCodeElements();
+
+            if (SkipCodeElement())
+            {
+                return false;
+            }
+
             _metrics.IncrementCodeElements();
             
             var elemType = GetCodeElementType();
@@ -189,6 +196,51 @@ namespace Dedox
             Info("All the documentation was written by a tool.");
             
             return true;
+        }
+
+        private bool SkipCodeElement()
+        {
+            return !_config.IncludeGeneratedCode && IsGeneratedCodeElement();
+        }
+
+        protected bool IsGeneratedCodeElement(Func<SyntaxList<AttributeListSyntax>> attributeGetter)
+        {
+            const string genCodeName = "GeneratedCode";
+
+            var attrNames = attributeGetter().SelectMany(attrList => attrList.Attributes).Select(a => a.Name).ToList();
+
+            var qaNames = attrNames
+                .Where(n => n.Kind == SyntaxKind.QualifiedName)
+                .Cast<QualifiedNameSyntax>()
+                .Select(n => n.Right.Identifier);
+            if (qaNames.Any(n => n.ValueText == genCodeName))
+            {
+                Debug("Code element {0} {1} is annotated with the GeneratedCode attribute.", GetCodeElementType(), Name);
+                return true;
+            }
+
+            var idNames = attrNames
+                .Where(n => n.Kind == SyntaxKind.IdentifierName)
+                .Cast<IdentifierNameSyntax>()
+                .Select(n => n.Identifier);
+
+            if (idNames.Any(n => n.ValueText == genCodeName))
+            {
+                Debug("Code element {0} {1} is annotated with the GeneratedCode attribute.", GetCodeElementType(), Name);
+                return true;
+            }
+
+            return false;
+        }   
+
+        protected bool IsGeneratedCodeElement(TypeDeclarationSyntax declaration)
+        {
+            return IsGeneratedCodeElement(() => declaration.AttributeLists);
+        }
+
+        protected virtual bool IsGeneratedCodeElement()
+        {
+            return false;
         }
 
         protected virtual void OnMismatch(string tag, string expectedComment, string actualComment)

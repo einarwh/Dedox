@@ -2,6 +2,8 @@
 {
     public interface IDedoxMetrics
     {
+        int AllCodeElements { get; }
+
         int CodeElements { get; }
 
         int CodeElementsWithDocumentation { get; }
@@ -13,5 +15,7 @@
         void IncrementCodeElementsWithDocumentation();
 
         void IncrementCodeElementsWithGeneratedDocumentation();
+
+        void IncrementAllCodeElements();
     }
 }

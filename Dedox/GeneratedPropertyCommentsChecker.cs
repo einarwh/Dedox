@@ -21,6 +21,20 @@ namespace Dedox
             }
         }
 
+        protected TypeDeclarationSyntax DeclaringCodeElement
+        {
+            get
+            {
+                return (TypeDeclarationSyntax)It.Parent;
+            }
+        }
+
+        protected override bool IsGeneratedCodeElement()
+        {
+            // Check locally first!
+            return IsGeneratedCodeElement(DeclaringCodeElement);
+        }
+
         protected override List<Func<string>> GetExpectedCommentForTag(XmlElementStartTagSyntax startTag)
         {
             var tag = startTag.Name.LocalName.ValueText;
@@ -44,7 +58,9 @@ namespace Dedox
             return new List<Func<string>>
                        {
                            () => string.Format("The {0}.", StyleCopDecompose(Name)),
-                           () => string.Format("The {0}.", Name)
+                           () => string.Format("The {0}.", Name),
+                           () => string.Format("The {0} value.", StyleCopDecompose(Name)),
+                           () => string.Format("The {0} value.", Name)
                        };
         }
 

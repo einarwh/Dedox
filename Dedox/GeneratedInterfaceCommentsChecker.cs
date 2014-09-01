@@ -46,5 +46,10 @@ namespace Dedox
             Info("Unexpected tag {0} in interface comment.", tag);
             return new List<Func<string>>();
         }
+
+        protected override bool IsGeneratedCodeElement()
+        {
+            return IsGeneratedCodeElement(It);
+        }
     }
 }

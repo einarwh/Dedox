@@ -28,6 +28,8 @@ namespace Dedox
 
         public bool VeryVerbose { get; set; }
 
+        public bool IncludeGeneratedCode { get; set; }
+
         public string OutputDirectory { get; set; }
 
         public int LevenshteinLimit { get; set; }

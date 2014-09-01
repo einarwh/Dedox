@@ -157,5 +157,21 @@ namespace Dedox
                            () => string.Format("The {0}.", Name)
                        };
         }
+
+        protected TypeDeclarationSyntax DeclaringCodeElement
+        {
+            get
+            {
+                return (TypeDeclarationSyntax)It.Parent;
+            }
+        }
+
+        protected override bool IsGeneratedCodeElement()
+        {
+            // Check locally first!
+            return IsGeneratedCodeElement(DeclaringCodeElement);
+        }
     }
+
+
 }
