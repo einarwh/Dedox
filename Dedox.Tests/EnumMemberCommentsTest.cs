@@ -6,7 +6,7 @@ using Moq;
 namespace Dedox.Tests
 {
     [TestClass]
-    public class EnumMemberCommentsTest
+    public class EnumMemberCommentsTest : CommentsTest
     {
         [TestMethod]
         public void StripsBasicPattern()
@@ -67,35 +67,5 @@ public enum Stranger
 ";
             VerifyRetain(text);
         }
-
-        private static void VerifyRetain(string input)
-        {
-            var actual = RunTest(input);
-            Assert.IsNull(actual);
-        }
-
-        private static void VerifyStrip(string input, string output)
-        {
-            var actual = RunTest(input);
-            Assert.AreEqual(output, actual);
-        }
-
-        private static string RunTest(string input)
-        {
-            var writerMock = new Mock<IConsoleWriter>();
-            var writer = writerMock.Object;
-
-            var configMock = new Mock<IDedoxConfig>();
-            configMock.SetupGet(it => it.Writer).Returns(writer);
-
-            var metricsMock = new Mock<IDedoxMetrics>();
-
-            var config = configMock.Object;
-            var metrics = metricsMock.Object;
-
-            var sut = new Dedoxifier(config, metrics);
-            return sut.Run(input);
-        }
-
     }
 }

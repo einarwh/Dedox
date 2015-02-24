@@ -54,8 +54,11 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ClassCommentsTest.cs" />
+    <Compile Include="CommentsTest.cs" />
     <Compile Include="EnumMemberCommentsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ConstructorCommentsTest.cs" />
+    <Compile Include="MethodCommentsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dedox\Dedox.csproj">

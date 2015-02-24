@@ -1,24 +1,21 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Moq;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Dedox.Tests
 {
     [TestClass]
-    public class ClassCommentsTest
+    public class ClassCommentsTest : CommentsTest
     {
         [TestMethod]
         public void StripsPattern1CapsRetained()
         {
             const string text = @"
 /// <summary>
-/// The Foo Bar Baz.
+/// The Stupid It Burns.
 /// </summary>
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             const string expected = @"
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             VerifyStrip(text, expected);
         }
@@ -28,12 +25,12 @@ public class FooBarBaz {}
         {
             const string text = @"
 /// <summary>
-/// The foo bar baz.
+/// The stupid it burns.
 /// </summary>
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             const string expected = @"
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             VerifyStrip(text, expected);
         }
@@ -43,12 +40,12 @@ public class FooBarBaz {}
         {
             const string text = @"
 /// <summary>
-/// The FooBarBaz.
+/// The StupidItBurns.
 /// </summary>
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             const string expected = @"
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             VerifyStrip(text, expected);
         }
@@ -58,12 +55,12 @@ public class FooBarBaz {}
         {
             const string text = @"
 /// <summary>
-/// The Foo Bar Baz class.
+/// The Stupid It Burns class.
 /// </summary>
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             const string expected = @"
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             VerifyStrip(text, expected);
         }
@@ -73,12 +70,12 @@ public class FooBarBaz {}
         {
             const string text = @"
 /// <summary>
-/// The foo bar baz class.
+/// The stupid it burns class.
 /// </summary>
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             const string expected = @"
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             VerifyStrip(text, expected);
         }
@@ -88,12 +85,12 @@ public class FooBarBaz {}
         {
             const string text = @"
 /// <summary>
-/// The FooBarBaz class.
+/// The StupidItBurns class.
 /// </summary>
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             const string expected = @"
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             VerifyStrip(text, expected);
         }
@@ -106,38 +103,9 @@ public class FooBarBaz {}
 /// <summary>
 /// This class handles coordination between domain objects X and Y.
 /// </summary>
-public class FooBarBaz {}
+public class StupidItBurns {}
 ";
             VerifyRetain(text);
-        }
-
-        private static void VerifyRetain(string input)
-        {
-            var actual = RunTest(input);
-            Assert.IsNull(actual);
-        }
-
-        private static void VerifyStrip(string input, string output)
-        {
-            var actual = RunTest(input);
-            Assert.AreEqual(output, actual);
-        }
-
-        private static string RunTest(string input)
-        {
-            var writerMock = new Mock<IConsoleWriter>();
-            var writer = writerMock.Object;
-
-            var configMock = new Mock<IDedoxConfig>();
-            configMock.SetupGet(it => it.Writer).Returns(writer);
-
-            var metricsMock = new Mock<IDedoxMetrics>();
-
-            var config = configMock.Object;
-            var metrics = metricsMock.Object;
-
-            var sut = new Dedoxifier(config, metrics);
-            return sut.Run(input);
         }
     }
 }
