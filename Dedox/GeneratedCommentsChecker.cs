@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -205,26 +204,29 @@ namespace Dedox
 
         protected bool IsGeneratedCodeElement(Func<SyntaxList<AttributeListSyntax>> attributeGetter)
         {
-            const string genCodeName = "GeneratedCode";
-
             var attrNames = attributeGetter().SelectMany(attrList => attrList.Attributes).Select(a => a.Name).ToList();
 
-            var qaNames = attrNames
-                .Where(n => n.Kind == SyntaxKind.QualifiedName)
-                .Cast<QualifiedNameSyntax>()
-                .Select(n => n.Right.Identifier);
-            if (qaNames.Any(n => n.ValueText == genCodeName))
+            Func<SyntaxToken, bool> hasGeneratedCodeAttribute =
+                token => token.ValueText == "GeneratedCode" || token.ValueText == "GeneratedCodeAttribute";
+
+            var qaNames =
+                attrNames.Where(n => n.Kind == SyntaxKind.QualifiedName)
+                    .Cast<QualifiedNameSyntax>()
+                    .Select(n => n.Right.Identifier)
+                    .ToList();
+
+            if (qaNames.Any(hasGeneratedCodeAttribute))
             {
                 Debug("Code element {0} {1} is annotated with the GeneratedCode attribute.", GetCodeElementType(), Name);
                 return true;
             }
 
-            var idNames = attrNames
-                .Where(n => n.Kind == SyntaxKind.IdentifierName)
-                .Cast<IdentifierNameSyntax>()
-                .Select(n => n.Identifier);
+            var idNames =
+                attrNames.Where(n => n.Kind == SyntaxKind.IdentifierName)
+                    .Cast<IdentifierNameSyntax>()
+                    .Select(n => n.Identifier);
 
-            if (idNames.Any(n => n.ValueText == genCodeName))
+            if (idNames.Any(hasGeneratedCodeAttribute))
             {
                 Debug("Code element {0} {1} is annotated with the GeneratedCode attribute.", GetCodeElementType(), Name);
                 return true;
