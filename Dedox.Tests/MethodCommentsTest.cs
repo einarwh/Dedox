@@ -50,5 +50,48 @@ public class Factory
 ";
             VerifyStrip(text, expected);
         }
+
+        [TestMethod]
+        public void StripsGhostDocPattern1()
+        {
+            const string text = @"
+public class Mouse 
+{
+   /// <summary>
+   /// Nibbles the exquisite cheese.
+   /// </summary>
+   public void NibbleExquisiteCheese() {}
+}
+";
+            const string expected = @"
+public class Mouse 
+{
+   public void NibbleExquisiteCheese() {}
+}
+";
+            VerifyStrip(text, expected);
+        }
+
+        [TestMethod]
+        public void StripsGhostDocPattern2()
+        {
+            const string text = @"
+public class FireFighter
+{
+   /// <summary>
+   /// Fights the fire with.
+   /// </summary>
+   /// <param name=""fire"">The fire.</param>
+   public void FightFireWith(Fire fire) {}
+}
+";
+            const string expected = @"
+public class FireFighter
+{
+   public void FightFireWith(Fire fire) {}
+}
+";
+            VerifyStrip(text, expected);
+        }
     }
 }

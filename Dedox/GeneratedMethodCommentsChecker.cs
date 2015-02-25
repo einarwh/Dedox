@@ -151,11 +151,45 @@ namespace Dedox
             // Alternative: GhostDoc-style conjugation of verb: FooBar => Fooes the bar.
             // Alternative with parameters: GhostDoc-style: FooBar(thing) => Fooes the bar given the specified thing.
 
+            var decomposed = StyleCopDecompose(Name);
+            var ghostDocSentence = ToGhostDocSentence(BasicDecompose(Name));
+
             return new List<Func<string>>
                        {
-                           () => string.Format("The {0}.", StyleCopDecompose(Name)),
-                           () => string.Format("The {0}.", Name)
+                           () => string.Format("The {0}.", decomposed),
+                           () => string.Format("The {0}.", Name),
+                           () => string.Format(ghostDocSentence + ".")
                        };
+        }
+
+        private string ToGhostDocSentence(string[] basicDecompose)
+        {
+            return string.Join(" ", ToGhostDocSentenceParts(basicDecompose));
+        }
+
+        private IEnumerable<string> ToGhostDocSentenceParts(string[] decomposed)
+        {
+            if (decomposed.Length > 0)
+            {
+                var first = decomposed[0];
+                var cap = Char.ToUpperInvariant(first[0]) + first.Substring(1);
+                yield return Conjugate(cap);
+
+                if (decomposed.Length > 1)
+                {
+                    yield return "the";
+
+                    for (int i = 1; i < decomposed.Length; i++)
+                    {
+                        yield return decomposed[i];
+                    }
+                }
+            }
+        }
+
+        private static string Conjugate(string s)
+        {
+            return s[s.Length - 1] == 's' ? s : s + "s";
         }
 
         protected TypeDeclarationSyntax DeclaringCodeElement

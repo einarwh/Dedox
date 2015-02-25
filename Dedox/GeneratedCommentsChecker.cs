@@ -262,6 +262,11 @@ namespace Dedox
             return Regex.Replace(input, "([A-Z])", " $1", RegexOptions.Compiled).Trim();
         }
 
+        protected string[] BasicDecompose(string input)
+        {
+            return SplitCamelCase(input).Split(' ').Select(s => s.ToLower()).ToArray();
+        }
+
         protected string StyleCopDecompose(string input)
         {
             var lowercased = SplitCamelCase(input).Split(' ').Select(s => s.ToLower());
