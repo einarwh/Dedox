@@ -67,12 +67,14 @@
     <Compile Include="DebugConsoleWriter.cs" />
     <Compile Include="Dedoxifier.cs" />
     <Compile Include="DedoxMetrics.cs" />
+    <Compile Include="Experimentation.cs" />
     <Compile Include="GeneratedClassCommentsChecker.cs" />
     <Compile Include="GeneratedCommentsChecker.cs" />
     <Compile Include="GeneratedConstructorCommentsChecker.cs" />
     <Compile Include="GeneratedEnumCommentsChecker.cs" />
     <Compile Include="GeneratedEnumMemberCommentsChecker.cs" />
     <Compile Include="GeneratedFieldCommentsChecker.cs" />
+    <Compile Include="GeneratedIndexerCommentsChecker.cs" />
     <Compile Include="GeneratedInterfaceCommentsChecker.cs" />
     <Compile Include="GeneratedMethodCommentsChecker.cs" />
     <Compile Include="GeneratedPropertyCommentsChecker.cs" />

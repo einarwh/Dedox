@@ -93,5 +93,62 @@ public class FireFighter
 ";
             VerifyStrip(text, expected);
         }
+
+        [TestMethod]
+        public void StripsGhostDocPattern3()
+        {
+            const string text = @"
+public class Food
+{
+   /// <summary>
+   /// Eats this instance.
+   /// </summary>
+   public void Eat() {}
+}
+";
+            const string expected = @"
+public class Food
+{
+   public void Eat() {}
+}
+";
+            VerifyStrip(text, expected);
+        }
+
+        [TestMethod]
+        public void StripsGhostDocPattern3StaticMethod()
+        {
+            const string text = @"
+public class Food
+{
+   /// <summary>
+   /// Eats this instance.
+   /// </summary>
+   public static void Eat() {}
+}
+";
+            const string expected = @"
+public class Food
+{
+   public static void Eat() {}
+}
+";
+            VerifyStrip(text, expected);
+        }
+
+
+    }
+
+    public class StupidItBurns
+    {
+        /// <summary>
+        /// Fooes this instance.
+        /// </summary>
+        public void Foo() { }
+
+        /// <summary>
+        /// Bars this instance.
+        /// </summary>
+        public static void Bar() { }
     }
 }

@@ -37,6 +37,8 @@ namespace Dedox
                                    string.Format(
                                        "The {0} interface.",
                                        StyleCopDecompose(stylecopChoppedName)),
+                                   () => string.Format("The {0}.", stylecopChoppedName),
+                                   () => string.Format("The {0}.", StyleCopDecompose(stylecopChoppedName)),
                                    () => string.Format("The {0}.", Name),
                                    () => string.Format("The {0}.", StyleCopDecompose(Name))
                                };

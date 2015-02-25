@@ -184,6 +184,11 @@ namespace Dedox
                         yield return decomposed[i];
                     }
                 }
+                else
+                {
+                    yield return "this";
+                    yield return "instance";
+                }
             }
         }
 

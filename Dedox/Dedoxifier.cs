@@ -47,7 +47,11 @@ namespace Dedox
             var propertyNodes = nodes
                 .Where(n => n.Kind == SyntaxKind.PropertyDeclaration)
                 .Cast<PropertyDeclarationSyntax>();
-            
+
+            var indexerNodes = nodes
+                .Where(n => n.Kind == SyntaxKind.IndexerDeclaration)
+                .Cast<IndexerDeclarationSyntax>();
+
             var methodNodes = nodes
                 .Where(n => n.Kind == SyntaxKind.MethodDeclaration)
                 .Cast<MethodDeclarationSyntax>();
@@ -68,6 +72,8 @@ namespace Dedox
 
             var purgeProperties = propertyNodes.Where(IsPropertyDocumentationGenerated).ToList();
 
+            var purgeIndexers = indexerNodes.Where(IsIndexerDocumentationGenerated).ToList();
+
             var purgeMethods = methodNodes.Where(IsMethodDocumentationGenerated).ToList();
 
             var purgeCtors = ctorNodes.Where(IsConstructorDocumentationGenerated).ToList();
@@ -78,6 +84,7 @@ namespace Dedox
                 .Concat(purgeEnums)
                 .Concat(purgeEnumMembers)
                 .Concat(purgeProperties)
+                .Concat(purgeIndexers)
                 .Concat(purgeMethods)
                 .Concat(purgeCtors)
                 .ToList();
@@ -148,6 +155,17 @@ namespace Dedox
                     {
                         Info(" - {0}", p.Identifier.ValueText);
                     }
+
+                    Info();
+                }
+
+                if (purgeIndexers.Any())
+                {
+                    Info("Remove XML comments from these indexers:");
+                    //foreach (var p in purgeIndexers)
+                    //{
+                    //    Info(" - {0}", p.Identifier.ValueText);
+                    //}
 
                     Info();
                 }
@@ -236,6 +254,11 @@ namespace Dedox
         private bool IsPropertyDocumentationGenerated(PropertyDeclarationSyntax declaration)
         {
             return new GeneratedPropertyCommentsChecker(declaration, _config, _metrics).IsGenerated();
+        }
+
+        private bool IsIndexerDocumentationGenerated(IndexerDeclarationSyntax declaration)
+        {
+            return new GeneratedIndexerCommentsChecker(declaration, _config, _metrics).IsGenerated();
         }
 
         private void Info(string format, params object[] args)
