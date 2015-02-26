@@ -3,7 +3,7 @@ Dedox
 
 Detox for your .NET documentation.
 
-You can run Dedox on a single .cs file, all the files indicated by a .csproj file, or all the files indicated by a .sln file.
+You can run Dedox on individual .cs files, all the files indicated by a .csproj file, or all the files indicated by a .sln file.
 
 Dedox will output .cs files where useless comments have been stripped to an output folder. By default, this folder is C:\temp, but obviously you can override that. Dedox supports several flags:
 
