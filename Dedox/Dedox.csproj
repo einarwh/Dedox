@@ -67,7 +67,6 @@
     <Compile Include="DebugConsoleWriter.cs" />
     <Compile Include="Dedoxifier.cs" />
     <Compile Include="DedoxMetrics.cs" />
-    <Compile Include="Experimentation.cs" />
     <Compile Include="GeneratedClassCommentsChecker.cs" />
     <Compile Include="GeneratedCommentsChecker.cs" />
     <Compile Include="GeneratedConstructorCommentsChecker.cs" />
