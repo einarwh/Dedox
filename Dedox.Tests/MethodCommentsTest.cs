@@ -136,19 +136,19 @@ public class Food
             VerifyStrip(text, expected);
         }
 
-
-    }
-
-    public class StupidItBurns
-    {
-        /// <summary>
-        /// Fooes this instance.
-        /// </summary>
-        public void Foo() { }
-
-        /// <summary>
-        /// Bars this instance.
-        /// </summary>
-        public static void Bar() { }
+        [TestMethod]
+        public void RetainsUsefulMethodDocumentation()
+        {
+            const string text = @"
+public interface Magic  
+{
+   /// <summary>
+   /// Performs a magical O(n) Quux-sort in constant memory. 
+   /// <summary>
+   public List<int> QuuxSort(List<int> values);
+}
+";
+            VerifyRetain(text);
+        }
     }
 }

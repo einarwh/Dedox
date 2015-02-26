@@ -38,13 +38,12 @@ namespace Dedox
                 return ExpectedCommentForParamTag(startTag);
             }
 
-
             if ("returns".Equals(tag))
             {
                 return GetPredictedIndexerReturnsText();
             }
 
-            Info("Unexpected tag {0} in property comment.", tag);
+            Info("Unexpected tag {0} in indexer comment.", tag);
 
             return new List<Func<string>>();
         }
