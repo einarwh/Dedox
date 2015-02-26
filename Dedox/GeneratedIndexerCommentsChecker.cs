@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using Roslyn.Compilers.CSharp;
 
@@ -137,10 +138,70 @@ namespace Dedox
 
         private List<Func<string>> GetPredictedIndexerSummaryText()
         {
+            Func<string, bool> hasAccessor =
+    accessorName => It.AccessorList.Accessors.Any(ads => accessorName.Equals(ads.Keyword.ValueText));
+            bool hasGetter = hasAccessor("get");
+            bool hasSetter = hasAccessor("set");
+
+            var t = It.Type;
+            var qualifiedTypeName = GetQualifiedTypeName(t);
+            var fstParam = It.ParameterList.Parameters.First();
+            var fstParamName = fstParam.Identifier.ValueText;
+
+            var s = "";
+            if (hasGetter && hasSetter)
+            {
+                s = "Gets or sets";
+            }
+            else if (hasGetter)
+            {
+                s = "Gets";
+            }
+            else if (hasSetter)
+            {
+                s = "Sets";
+            }
+
+            s = string.Format("{0} the <see cref=\"{1}\"/> with the specified {2}.", s, qualifiedTypeName, fstParamName);
+
             return new List<Func<string>>
                        {
-                           () => string.Format("The this.")
+                           () => string.Format("The this."),
+                           () => s
                        };
+        }
+
+        private string GetQualifiedTypeName(TypeSyntax typeSyntax)
+        {
+            if (typeSyntax is PredefinedTypeSyntax)
+            {
+                return GetQualifiedTypeName((PredefinedTypeSyntax)typeSyntax);
+            }
+
+            return "whaa";
+        }
+
+        private string GetQualifiedTypeName(PredefinedTypeSyntax typeSyntax)
+        {
+            var map = new Dictionary<SyntaxKind, Type>
+                          {
+                              { SyntaxKind.BoolKeyword, typeof(bool) },
+                              { SyntaxKind.ByteKeyword, typeof(byte) },
+                              { SyntaxKind.CharKeyword, typeof(char) },
+                              { SyntaxKind.DecimalKeyword, typeof(decimal) },
+                              { SyntaxKind.DoubleKeyword, typeof(double) },
+                              { SyntaxKind.FloatKeyword, typeof(float) },
+                              { SyntaxKind.IntKeyword, typeof(int) },
+                              { SyntaxKind.UIntKeyword, typeof(uint) },
+                              { SyntaxKind.LongKeyword, typeof(long) },
+                              { SyntaxKind.ULongKeyword, typeof(ulong) },
+                              { SyntaxKind.ObjectKeyword, typeof(object) },
+                              { SyntaxKind.ShortKeyword, typeof(short) },
+                              { SyntaxKind.UShortKeyword, typeof(ushort) },
+                              { SyntaxKind.StringKeyword, typeof(string) },
+                          };
+
+            return map[typeSyntax.Keyword.Kind].ToString();
         }
     }
 }
