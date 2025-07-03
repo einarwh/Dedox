@@ -1,9 +1,9 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dedox", "Dedox\Dedox.csproj", "{B83F7F54-8C99-4794-AF0D-8E73E6A005BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dedox", "Dedox\Dedox.csproj", "{B83F7F54-8C99-4794-AF0D-8E73E6A005BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dedox.Tests", "Dedox.Tests\Dedox.Tests.csproj", "{77A1A8FA-2812-4008-A542-9B6FD8CFC547}"
 EndProject
